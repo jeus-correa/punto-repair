@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import CyberMap from './CyberMap';
-import { Monitor, Cpu, ShieldCheck, Zap, Settings, CheckCircle2, Mail } from 'lucide-react';
+import { Monitor, Cpu, ShieldCheck, Zap, Settings, CheckCircle2, Mail, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './index.css';
 
@@ -22,35 +22,24 @@ const SocialIcons = ({ size = 20 }) => (
 );
 
 const AnimatedTitle = ({ visibleCount }) => {
-  const letters = "Punto Repair".split("");
-
   return (
-    <div className="hud-container">
-      <div className="hud-header">
-        <span className="hud-dot"></span>
-        <span className="hud-label">SIGNAL_STRENGTH: OPTIMAL</span>
-      </div>
-      <div className="animated-title-container right-side">
-        {letters.map((char, index) => (
-          <motion.span
-            key={index}
-            className={`animated-char ${index < visibleCount ? 'visible' : 'forming'}`}
-            initial={false}
-            animate={{ 
-              opacity: index < visibleCount ? 1 : 0.05,
-              x: index < visibleCount ? 0 : 5,
-            }}
-            transition={{ 
-              duration: 0.2,
-            }}
-          >
-            {char === " " ? "\u00A0" : char}
-          </motion.span>
-        ))}
-      </div>
-      <div className="hud-footer">
-        STATUS: RECEIVING_DATA...
-      </div>
+    <div className="simple-title-container">
+      <motion.h1 
+        className="simple-main-title"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        Punto Repair
+      </motion.h1>
+      <motion.p 
+        className="simple-subtitle"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      >
+        Resolviendo lo imposible, al instante.
+      </motion.p>
     </div>
   );
 };
@@ -58,11 +47,16 @@ const AnimatedTitle = ({ visibleCount }) => {
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [visibleCount, setVisibleCount] = useState(0);
+  const [theme, setTheme] = useState('light');
   const totalLetters = "Punto Repair".length;
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   useEffect(() => {
-    setIsLoaded(true);
-  }, []);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const handleImpact = useCallback(() => {
     setVisibleCount(prev => Math.min(totalLetters, prev + 3)); // Faster formation for cohesive feel
@@ -78,12 +72,15 @@ function App() {
       {/* Navigation */}
       <nav className="navbar">
         <div className="nav-brand">
-          <Monitor size={28} color="#00f3ff" />
+          <Monitor size={28} color="var(--accent)" />
           Punto<span>Repair</span>
         </div>
         <div className="nav-right">
           <SocialIcons size={22} />
-          <button className="btn-primary">Agendar Diagnóstico</button>
+          <button className="theme-toggle" onClick={toggleTheme} title="Cambiar Tema">
+            {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
+          </button>
+          <button className="btn-primary">Habla con nosotros</button>
         </div>
       </nav>
 
@@ -183,24 +180,43 @@ function App() {
           </div>
         </section>
 
-        {/* Brands Section moved ABOVE carousel */}
+        {/* Brands Carousel Section */}
         <section className="brands-section">
-          <details className="brands-dropdown">
-            <summary className="brands-summary">
-              ¿Con qué marcas trabajamos?
-              <span className="dropdown-icon">▼</span>
-            </summary>
-            <div className="brands-content">
-              <div className="brand-logo">Apple / Mac</div>
-              <div className="brand-logo">ASUS / ROG</div>
-              <div className="brand-logo">MSI</div>
-              <div className="brand-logo">Lenovo / Legion</div>
-              <div className="brand-logo">HP / Omen</div>
-              <div className="brand-logo">Dell / Alienware</div>
-              <div className="brand-logo">Acer / Predator</div>
-              <div className="brand-logo">Samsung</div>
+          <h2 className="section-title">Las marcas que trabajamos</h2>
+          <div className="carousel-container brands-carousel">
+            <div className="carousel-track brands-track">
+              {/* Brand Logos as clickable links */}
+              {[
+                { name: "Apple", link: "#" },
+                { name: "ASUS", link: "#" },
+                { name: "MSI", link: "#" },
+                { name: "Lenovo", link: "#" },
+                { name: "HP", link: "#" },
+                { name: "Dell", link: "#" },
+                { name: "Acer", link: "#" },
+                { name: "Samsung", link: "#" }
+              ].map((brand, i) => (
+                <a key={i} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+                  {brand.name}
+                </a>
+              ))}
+              {/* Duplicated for infinite loop */}
+              {[
+                { name: "Apple", link: "#" },
+                { name: "ASUS", link: "#" },
+                { name: "MSI", link: "#" },
+                { name: "Lenovo", link: "#" },
+                { name: "HP", link: "#" },
+                { name: "Dell", link: "#" },
+                { name: "Acer", link: "#" },
+                { name: "Samsung", link: "#" }
+              ].map((brand, i) => (
+                <a key={`dup-${i}`} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+                  {brand.name}
+                </a>
+              ))}
             </div>
-          </details>
+          </div>
         </section>
 
         {/* Our Work Carousel */}

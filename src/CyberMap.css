@@ -24,12 +24,12 @@
 }
 
 .stats-box {
-  background: rgba(0, 20, 50, 0.6);
-  border: 1px solid rgba(0, 243, 255, 0.3);
+  background: var(--nav-bg);
+  border: 1px solid var(--card-border);
   padding: 15px 20px;
   border-radius: 8px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--card-shadow);
 }
 
 .text-right {
@@ -39,7 +39,7 @@
 .stats-title {
   font-size: 0.75rem;
   letter-spacing: 2px;
-  color: #00f3ff;
+  color: var(--accent);
   opacity: 0.8;
   margin-bottom: 5px;
   font-weight: 600;
@@ -49,32 +49,23 @@
   font-size: 2rem;
   font-family: monospace;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  text-shadow: 0 0 10px var(--accent-glow);
 }
 
 .text-accent {
-  color: #00f3ff;
-  text-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
+  color: var(--accent);
+  text-shadow: 0 0 15px var(--accent-glow);
 }
 
-.cyber-line {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: dash 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-}
-
-.cyber-line-glow {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: dash 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-  filter: drop-shadow(0 0 6px #00f3ff) drop-shadow(0 0 12px #00f3ff);
-}
-
-@keyframes dash {
-  to {
-    stroke-dashoffset: 0;
-  }
+.attack-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .map-svg {

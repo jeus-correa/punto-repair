@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ComposableMap, Geographies, Geography, Marker, Line } from 'react-simple-maps';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import './CyberMap.css';
 
 // URL to TopoJSON of the world
@@ -9,148 +9,188 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 // Target: Curicó, Chile
 const targetCoords = [-71.2858, -34.9828];
 
-// Origins: Other regions/cities in Chile
-const chileRegions = [
-  { name: "Arica", coords: [-70.3126, -18.4783] },
-  { name: "Iquique", coords: [-70.1357, -20.2208] },
-  { name: "Antofagasta", coords: [-70.4000, -23.6500] },
-  { name: "Copiapó", coords: [-70.3333, -27.3667] },
-  { name: "La Serena", coords: [-71.2519, -29.9045] },
-  { name: "Valparaíso", coords: [-71.6127, -33.0472] },
-  { name: "Santiago", coords: [-70.6693, -33.4489] },
-  { name: "Concepción", coords: [-73.0498, -36.8201] },
-  { name: "Temuco", coords: [-72.5904, -38.7359] },
-  { name: "Valdivia", coords: [-73.2459, -39.8142] },
-  { name: "Puerto Montt", coords: [-72.9423, -41.4693] },
-  { name: "Coyhaique", coords: [-72.0662, -45.5712] },
-  { name: "Punta Arenas", coords: [-70.9167, -53.1500] }
-];
+// Use standard viewport percentage for origins
+const generateRandomOriginViewport = () => {
+  const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+  let x, y;
+  
+  switch(edge) {
+    case 0: // Top
+      x = Math.random() * 100;
+      y = -10;
+      break;
+    case 1: // Right
+      x = 110;
+      y = Math.random() * 100;
+      break;
+    case 2: // Bottom
+      x = Math.random() * 100;
+      y = 110;
+      break;
+    default: // Left
+      x = -10;
+      y = Math.random() * 100;
+      break;
+  }
+  return { x, y };
+};
 
 export default function CyberMap({ onConnection, onImpact }) {
   const [activeConnections, setActiveConnections] = useState([]);
+  const [targetPoint, setTargetPoint] = useState({ x: window.innerWidth * 0.58, y: window.innerHeight * 0.52 });
+  const markerRef = useRef(null);
 
-  // Rotate connections to simulate network traffic
+  // Keep target point precisely on the marker using actual DOM position
+  useEffect(() => {
+    const updateTarget = () => {
+      if (markerRef.current) {
+        const rect = markerRef.current.getBoundingClientRect();
+        setTargetPoint({
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        });
+      }
+    };
+    
+    // Initial update and resize listener
+    updateTarget();
+    // Use a small timeout to ensure map projection has rendered before getting coords
+    setTimeout(updateTarget, 100);
+    window.addEventListener('resize', updateTarget);
+    return () => window.removeEventListener('resize', updateTarget);
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      const attackCount = Math.floor(Math.random() * 4) + 2; // More connections for faster formation
+      const attackCount = Math.floor(Math.random() * 3) + 2; 
       const nextAttacks = [];
-      const originsCopy = [...chileRegions];
       
       for(let i=0; i<attackCount; i++) {
-        const randIndex = Math.floor(Math.random() * originsCopy.length);
-        const origin = originsCopy.splice(randIndex, 1)[0];
+        // Convert the 0-100 percentages to actual pixel values across the screen
+        const rawOrigin = generateRandomOriginViewport();
+        const pixelOrigin = {
+          x: (rawOrigin.x / 100) * window.innerWidth,
+          y: (rawOrigin.y / 100) * window.innerHeight
+        };
+
         nextAttacks.push({
-          ...origin,
           id: Math.random().toString(), 
+          origin: pixelOrigin,
+          intensity: Math.random(),
+          side: Math.random() > 0.5 ? 1 : -1
         });
 
-        // Trigger an impact event after the animation finishes (2.5s)
         if (onImpact) {
           setTimeout(() => {
             onImpact();
-          }, 2500);
+          }, 1500); 
         }
       }
 
       setActiveConnections(nextAttacks);
       if (onConnection) onConnection(nextAttacks.length);
-    }, 2800);
+    }, 2200);
 
     return () => clearInterval(interval);
   }, [onConnection, onImpact]);
 
+  const staticMapLayer = useMemo(() => (
+    <ComposableMap
+      projection="geoMercator"
+      projectionConfig={{
+        scale: 1100,
+        center: [-80, -38] 
+      }}
+      className="map-svg"
+    >
+      <Geographies geography={geoUrl}>
+        {({ geographies }) =>
+          geographies.map((geo) => {
+            if (geo.properties.name !== "Chile") return null;
+            
+            return (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="var(--hud-bg)"
+                stroke="var(--accent)"
+                strokeWidth={1.5}
+                style={{
+                  default: { outline: "none" },
+                  hover: { outline: "none" },
+                  pressed: { outline: "none" },
+                }}
+              />
+            );
+          })
+        }
+      </Geographies>
+
+      <Marker coordinates={targetCoords}>
+        <motion.circle
+          r={16}
+          fill="var(--accent-glow)"
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 2], opacity: [1, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+        />
+        <circle ref={markerRef} r={4} fill="var(--accent)" style={{ filter: "drop-shadow(0 0 10px var(--accent))" }} />
+      </Marker>
+    </ComposableMap>
+  ), []);
+
   return (
     <div className="cyber-map-container">
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{
-          scale: 1100,
-          center: [-80, -38] // Shifted map to the right
-        }}
-        className="map-svg"
-      >
-        <Geographies geography={geoUrl}>
-          {({ geographies }) =>
-            geographies.map((geo) => {
-              const isChile = geo.properties.name === "Chile";
-              if (!isChile) return null;
-              
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="rgba(0, 243, 255, 0.12)"
-                  stroke="#00f3ff"
-                  strokeWidth={1.5}
-                  style={{
-                    default: { outline: "none" },
-                    hover: { outline: "none" },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              );
-            })
-          }
-        </Geographies>
+      {staticMapLayer}
 
-        <Marker coordinates={targetCoords}>
-          <motion.circle
-            r={16}
-            fill="rgba(0, 243, 255, 0.2)"
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 2], opacity: [1, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-          />
-          <motion.circle
-            r={8}
-            fill="rgba(0, 243, 255, 0.4)"
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 1.5], opacity: [1, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-          />
-          <circle r={3} fill="#00f3ff" style={{ filter: "drop-shadow(0 0 5px #00f3ff)" }} />
-        </Marker>
+      {/* SVG Overlay using EXACT Pixel Coordinates */}
+      <svg className="attack-overlay" style={{ width: '100%', height: '100%' }}>
+        {activeConnections.map((conn) => {
+          const dx = targetPoint.x - conn.origin.x;
+          const dy = targetPoint.y - conn.origin.y;
+          const midX = (conn.origin.x + targetPoint.x) / 2;
+          const midY = (conn.origin.y + targetPoint.y) / 2;
+          
+          // Severe parabolic fall
+          const arcAmount = 0.5 + (conn.intensity * 0.5);
+          const offsetX = -dy * arcAmount * conn.side;
+          const offsetY = dx * arcAmount * conn.side;
 
-        {activeConnections.map((conn) => (
-          <CyberConnection
-            key={conn.id}
-            from={conn.coords}
-            to={targetCoords}
-          />
-        ))}
-      </ComposableMap>
+          const ctrlX = midX + offsetX;
+          const ctrlY = midY + offsetY;
+
+          const pathData = `M ${conn.origin.x} ${conn.origin.y} Q ${ctrlX} ${ctrlY} ${targetPoint.x} ${targetPoint.y}`;
+
+          return (
+            <g key={conn.id}>
+              {/* Trail */}
+              <motion.path
+                d={pathData}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth={2}
+                strokeLinecap="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: [0, 0.4, 0], opacity: [0, 0.8, 0] }}
+                transition={{ duration: 1.8, ease: "easeOut" }}
+                style={{ filter: "blur(2px)" }}
+              />
+              {/* Comet Head */}
+              <motion.path
+                d={pathData}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth={4}
+                strokeLinecap="round"
+                initial={{ pathLength: 0.01, pathOffset: 0 }}
+                animate={{ pathOffset: 1 }}
+                transition={{ duration: 1.8, ease: "easeOut" }}
+                style={{ filter: "drop-shadow(0 0 4px var(--accent))" }}
+              />
+            </g>
+          );
+        })}
+      </svg>
     </div>
-  );
-}
-
-function CyberConnection({ from, to }) {
-  return (
-    <>
-      <Line
-        from={from}
-        to={to}
-        stroke="rgba(0, 243, 255, 0.15)"
-        strokeWidth={1}
-        strokeLinecap="round"
-      />
-      <Line
-        from={from}
-        to={to}
-        stroke="#00f3ff"
-        strokeWidth={2}
-        strokeLinecap="round"
-        className="cyber-line-glow"
-      />
-      <Marker coordinates={from}>
-         <motion.circle
-              r={3}
-              fill="#ff3b5c"
-              initial={{ scale: 1, opacity: 1 }}
-              animate={{ scale: [1, 2], opacity: [1, 0] }}
-              transition={{ duration: 1, repeat: Infinity }}
-            />
-         <circle r={1.5} fill="#ff3b5c" />
-      </Marker>
-    </>
   );
 }
