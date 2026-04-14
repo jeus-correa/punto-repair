@@ -71,4 +71,10 @@
 .map-svg {
   width: 100vw !important;
   height: 100vh !important;
+  pointer-events: none;
 }
+
+.target-clickable-point {
+  pointer-events: none;
+}
+

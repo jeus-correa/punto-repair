@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ComposableMap, Geographies, Geography, Marker, Line } from 'react-simple-maps';
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import './CyberMap.css';
 
@@ -35,7 +35,7 @@ const generateRandomOriginViewport = () => {
   return { x, y };
 };
 
-export default function CyberMap({ onConnection, onImpact }) {
+export default function CyberMap({ onTargetClick }) {
   const [activeConnections, setActiveConnections] = useState([]);
   const [targetPoint, setTargetPoint] = useState({ x: window.innerWidth * 0.58, y: window.innerHeight * 0.52 });
   const markerRef = useRef(null);
@@ -45,10 +45,13 @@ export default function CyberMap({ onConnection, onImpact }) {
     const updateTarget = () => {
       if (markerRef.current) {
         const rect = markerRef.current.getBoundingClientRect();
-        setTargetPoint({
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
-        });
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const pageX = x + window.scrollX;
+        const pageY = y + window.scrollY;
+        setTargetPoint({ x, y });
+        document.documentElement.style.setProperty('--map-target-page-x', `${pageX}px`);
+        document.documentElement.style.setProperty('--map-target-page-y', `${pageY}px`);
       }
     };
     
@@ -62,7 +65,7 @@ export default function CyberMap({ onConnection, onImpact }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const attackCount = Math.floor(Math.random() * 3) + 2; 
+      const attackCount = Math.floor(Math.random() * 2) + 2;
       const nextAttacks = [];
       
       for(let i=0; i<attackCount; i++) {
@@ -80,19 +83,13 @@ export default function CyberMap({ onConnection, onImpact }) {
           side: Math.random() > 0.5 ? 1 : -1
         });
 
-        if (onImpact) {
-          setTimeout(() => {
-            onImpact();
-          }, 1500); 
-        }
       }
 
       setActiveConnections(nextAttacks);
-      if (onConnection) onConnection(nextAttacks.length);
     }, 2200);
 
     return () => clearInterval(interval);
-  }, [onConnection, onImpact]);
+  }, []);
 
   const staticMapLayer = useMemo(() => (
     <ComposableMap
@@ -134,7 +131,15 @@ export default function CyberMap({ onConnection, onImpact }) {
           animate={{ scale: [0, 2], opacity: [1, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
         />
-        <circle ref={markerRef} r={4} fill="var(--accent)" style={{ filter: "drop-shadow(0 0 10px var(--accent))" }} />
+        <motion.circle
+          ref={markerRef}
+          r={4}
+          fill="var(--accent)"
+          className="target-clickable-point"
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+          style={{ filter: "drop-shadow(0 0 10px var(--accent))" }}
+        />
       </Marker>
     </ComposableMap>
   ), []);
@@ -168,29 +173,30 @@ export default function CyberMap({ onConnection, onImpact }) {
                 d={pathData}
                 fill="none"
                 stroke="var(--accent)"
-                strokeWidth={2}
+                strokeWidth={3}
                 strokeLinecap="round"
                 initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: [0, 0.4, 0], opacity: [0, 0.8, 0] }}
-                transition={{ duration: 1.8, ease: "easeOut" }}
-                style={{ filter: "blur(2px)" }}
+                animate={{ pathLength: [0, 0.72, 0], opacity: [0, 0.95, 0] }}
+                transition={{ duration: 2.3, ease: "easeOut" }}
+                style={{ filter: "blur(4px)" }}
               />
               {/* Comet Head */}
               <motion.path
                 d={pathData}
                 fill="none"
                 stroke="var(--accent)"
-                strokeWidth={4}
+                strokeWidth={6}
                 strokeLinecap="round"
                 initial={{ pathLength: 0.01, pathOffset: 0 }}
                 animate={{ pathOffset: 1 }}
-                transition={{ duration: 1.8, ease: "easeOut" }}
-                style={{ filter: "drop-shadow(0 0 4px var(--accent))" }}
+                transition={{ duration: 2.3, ease: "easeOut" }}
+                style={{ filter: "drop-shadow(0 0 8px var(--accent))" }}
               />
             </g>
           );
         })}
       </svg>
+
     </div>
   );
 }
