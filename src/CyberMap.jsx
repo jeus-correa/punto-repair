@@ -26,13 +26,13 @@ const chileRegions = [
   { name: "Punta Arenas", coords: [-70.9167, -53.1500] }
 ];
 
-export default function CyberMap() {
+export default function CyberMap({ onConnection, onImpact }) {
   const [activeConnections, setActiveConnections] = useState([]);
 
   // Rotate connections to simulate network traffic
   useEffect(() => {
     const interval = setInterval(() => {
-      const attackCount = Math.floor(Math.random() * 4) + 1;
+      const attackCount = Math.floor(Math.random() * 4) + 2; // More connections for faster formation
       const nextAttacks = [];
       const originsCopy = [...chileRegions];
       
@@ -43,21 +43,29 @@ export default function CyberMap() {
           ...origin,
           id: Math.random().toString(), 
         });
+
+        // Trigger an impact event after the animation finishes (2.5s)
+        if (onImpact) {
+          setTimeout(() => {
+            onImpact();
+          }, 2500);
+        }
       }
 
       setActiveConnections(nextAttacks);
+      if (onConnection) onConnection(nextAttacks.length);
     }, 2800);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [onConnection, onImpact]);
 
   return (
     <div className="cyber-map-container">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 1100, // Adjusted scale so the entire length of Chile is visible
-          center: [-71, -38] // Centered correctly
+          scale: 1100,
+          center: [-80, -38] // Shifted map to the right
         }}
         className="map-svg"
       >
