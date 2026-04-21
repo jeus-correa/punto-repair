@@ -1,8 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CyberMap from './CyberMap';
-import { Monitor, ShieldCheck, Zap, Settings, CheckCircle2, Mail, Sun, Moon } from 'lucide-react';
+import { Monitor, ShieldCheck, Zap, Settings, CheckCircle2, Mail, Sun, Moon, ChevronLeft, ChevronRight, Globe, Wrench, Eye, Users, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './index.css';
+
+const BRANDS_LIST = [
+  { name: "Apple", link: "https://www.apple.com/cl/mac/" },
+  { name: "ASUS", link: "https://www.asus.com/cl/" },
+  { name: "MSI", link: "https://www.msi.com/index.php" },
+  { name: "Lenovo", link: "https://www.lenovo.com/cl/es/" },
+  { name: "HP", link: "https://www.hp.com/cl-es/home.html" },
+  { name: "Dell", link: "https://www.dell.com/es-cl" },
+  { name: "Acer", link: "https://www.acerstore.cl/" },
+  { name: "Samsung", link: "https://www.samsung.com/cl/" },
+  { name: "LG", link: "https://www.lg.com/cl/" },
+  { name: "Intel", link: "https://www.intel.com/" },
+  { name: "AMD", link: "https://www.amd.com/es" },
+  { name: "eMachines", link: "https://www.emachines.com/" },
+  { name: "NVIDIA", link: "https://www.nvidia.com/es-la/" },
+  { name: "Kingston", link: "https://www.kingston.com/es" },
+  { name: "Western Digital", link: "https://www.westerndigital.com/es-cl" },
+  { name: "Casio", link: "https://www.casio.com/" },
+  { name: "TP-Link", link: "https://www.tp-link.com/cl/" },
+  { name: "Huawei", link: "https://consumer.huawei.com/cl/" },
+  { name: "Ubiquiti", link: "https://www.ui.com/" },
+  { name: "MikroTik", link: "https://mikrotik.com/" },
+  { name: "Alienware", link: "https://www.dell.com/es-cl/gaming/alienware", iconDomain: "alienware.com" },
+  { name: "Razer", link: "https://www.razer.com/" },
+  { name: "Microsoft", link: "https://www.microsoft.com/es-cl" },
+  { name: "Positivo", link: "https://www.positivotecnologia.com.br/" },
+  { name: "Fujitsu", link: "https://www.fujitsu.com/" },
+  { name: "Xiaomi", link: "https://www.mi.com/cl/" },
+  { name: "Honor", link: "https://www.hihonor.com/cl/" },
+  { name: "Dynabook", link: "https://dynabook.com/" },
+  { name: "Panasonic", link: "https://www.panasonic.com/es/consumer/todos-los-productos-panasonic.html" },
+  { name: "Sony", link: "https://www.sony.cl/" },
+  { name: "VAIO", link: "https://www.vaio.com/" },
+  { name: "Olidata", link: "https://olidata.com/" },
+  { name: "Toshiba", link: "https://www.global.toshiba/jp/top.html" },
+  { name: "Unix", link: "https://www.unix.org/" },
+  { name: "Corsair", link: "https://www.corsair.com/" },
+  { name: "Gigabyte", link: "https://www.gigabyte.com/" },
+  { name: "macOS", link: "https://www.apple.com/macos/" },
+  { name: "Google", link: "https://www.google.com/" },
+  { name: "Adobe", link: "https://www.adobe.com/" },
+  { name: "OKI", link: "https://www.oki.com/" },
+  { name: "Zebra", link: "https://www.zebra.com/" },
+  { name: "Kyocera", link: "https://www.kyocera.com/" },
+  { name: "Ricoh", link: "https://www.ricoh.com/" },
+  { name: "D-Link", link: "https://www.dlink.com/" },
+  { name: "Linux", link: "https://www.linux.org/" },
+  { name: "Fujitel", link: "https://www.rcl.cl/brand/19-fujitel", iconDomain: "fujitel.cl" },
+  { name: "Master-G", link: "https://www.masterg.cl/" },
+  { name: "Maxwell", link: "https://maxwell.com/" },
+  { name: "Motorola", link: "https://www.motorola.cl/" },
+  { name: "Epson", link: "https://epson.cl/" },
+  { name: "ViewSonic", link: "https://www.viewsonic.com/" },
+  { name: "Linkmade", link: "https://linkmade.cl/" },
+  { name: "Philips", link: "https://www.philips.cl/" },
+  { name: "IBM", link: "https://www.ibm.com/" },
+  { name: "Windows", link: "https://www.microsoft.com/windows" },
+  { name: "Qualcomm", link: "https://www.qualcomm.com/" },
+  { name: "MediaTek", link: "https://www.mediatek.com/" },
+  { name: "Micron", link: "https://www.micron.com/" }
+];
 
 const SocialIcons = ({ size = 20, variant = 'default' }) => (
   <div className={`social-links-container ${variant === 'nav' ? 'social-links-nav' : ''}`}>
@@ -44,9 +105,59 @@ const AnimatedTitle = () => {
   );
 };
 
+const StatsBanner = () => {
+  return (
+    <div className="stats-banner-wrapper">
+      <div className="stats-banner">
+        <div className="stat-item">
+          <Eye size={36} className="stat-icon" />
+          <div className="stat-value">2,004</div>
+          <div className="stat-label">VISITAS</div>
+        </div>
+        <div className="stat-item">
+          <Users size={36} className="stat-icon" />
+          <div className="stat-value">300+</div>
+          <div className="stat-label">CLIENTES FELICES</div>
+        </div>
+        <div className="stat-item">
+          <Star size={36} className="stat-icon" />
+          <div className="stat-value">7.0</div>
+          <div className="stat-label">CALIFICACIÓN</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [theme, setTheme] = useState('light');
   const [locationBlink, setLocationBlink] = useState(false);
+  const carouselRef = useRef(null);
+  const isHovered = useRef(false);
+
+  useEffect(() => {
+    let animationId;
+    const scroll = () => {
+      if (carouselRef.current && !isHovered.current) {
+        carouselRef.current.scrollLeft += 1;
+        
+        // Loop back seamlessly if scrolled past the first set of items
+        if (carouselRef.current.scrollLeft >= carouselRef.current.scrollWidth / 2) {
+          carouselRef.current.scrollLeft = 0;
+        }
+      }
+      animationId = requestAnimationFrame(scroll);
+    };
+    animationId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  const scrollCarousel = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = 500;
+      carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -68,12 +179,6 @@ function App() {
   return (
     <>
       <CyberMap onTargetClick={goToLocation} />
-      <button
-        type="button"
-        className="background-map-point"
-        onClick={goToLocation}
-        aria-label="Ir a donde nos ubicamos"
-      />
       
       {/* Navigation */}
       <nav className="navbar">
@@ -123,60 +228,55 @@ function App() {
           </div>
         </section>
 
-        {/* Pricing Plans */}
+        <StatsBanner />
+
+        {/* Services Section */}
         <section className="plans-section">
-          <h2 className="section-title">Planes de Mantenimiento</h2>
+          <h2 className="section-title">Nuestros Servicios</h2>
           <div className="plans-grid">
 
-            {/* Plan 1 */}
             <div className="plan-card">
               <div className="plan-icon">
-                <Settings size={40} />
+                <Monitor size={40} />
               </div>
-              <h3 className="plan-name">Básico</h3>
-              <div className="plan-price">$24.990<span>/servicio</span></div>
-              <ul className="plan-features">
-                <li><CheckCircle2 size={18} className="feature-check" /> Formateo e instalación de SO</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Limpieza de virus y malware</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Respaldo hasta 50GB</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Instalación de drivers</li>
-              </ul>
-              <button className="btn-primary">Elegir Plan</button>
+              <h3 className="plan-name">Equipamiento</h3>
+              <p className="service-text">
+                Reparación, mantenimiento y optimización de computadores, notebooks y equipos tecnológicos.<br/><br/>
+                Realizamos diagnóstico, cambio de componentes (SSD, RAM, placas) y cotizaciones según tus necesidades.
+              </p>
             </div>
 
-            {/* Plan 2 */}
-            <div className="plan-card popular">
-              <div className="popular-badge">Más Elegido</div>
+            <div className="plan-card">
               <div className="plan-icon">
                 <Zap size={40} />
               </div>
-              <h3 className="plan-name">Gamer / Pro</h3>
-              <div className="plan-price">$45.990<span>/servicio</span></div>
-              <ul className="plan-features">
-                <li><CheckCircle2 size={18} className="feature-check" /> Mantenimiento térmico (Pasta CPU/GPU)</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Optimización de BIOS / Undervolt</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Gestión de cables (Cable management)</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Instalación de hardware nuevo</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Soporte remoto 30 días</li>
-              </ul>
-              <button className="btn-primary solid">Elegir Plan</button>
+              <h3 className="plan-name">Redes</h3>
+              <p className="service-text">
+                Instalación, configuración y optimización de redes de internet para hogares y empresas.<br/><br/>
+                Trabajamos con routers, switches y cableado estructurado, asegurando una conexión estable, rápida y segura.
+              </p>
             </div>
 
-            {/* Plan 3 */}
             <div className="plan-card">
               <div className="plan-icon">
-                <ShieldCheck size={40} />
+                <Mail size={40} />
               </div>
-              <h3 className="plan-name">Corporativo</h3>
-              <div className="plan-price">$89.900<span>/mensual</span></div>
-              <ul className="plan-features">
-                <li><CheckCircle2 size={18} className="feature-check" /> Mantenimiento preventivo mensual</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Visitas presenciales ilimitadas</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Seguridad de red y firewall</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Recuperación avanzada de datos</li>
-                <li><CheckCircle2 size={18} className="feature-check" /> Auditoriás de software corporativo</li>
-              </ul>
-              <button className="btn-primary">Elegir Plan</button>
+              <h3 className="plan-name">Correos Corporativos</h3>
+              <p className="service-text">
+                Creamos y configuramos correos empresariales personalizados con tu dominio (ej: contacto@tuempresa.cl).<br/><br/>
+                Buscamos la mejor solución para tu negocio, gestionando usuarios, seguridad y acceso desde cualquier dispositivo.
+              </p>
+            </div>
+
+            <div className="plan-card">
+              <div className="plan-icon">
+                <Globe size={40} />
+              </div>
+              <h3 className="plan-name">Desarrollo Web</h3>
+              <p className="service-text">
+                Diseño y desarrollo de páginas web modernas, optimizadas y adaptadas a tu negocio.<br/><br/>
+                Creamos sitios informativos, catálogos o páginas de servicios con diseño profesional y enfoque en clientes.
+              </p>
             </div>
 
           </div>
@@ -185,40 +285,69 @@ function App() {
         {/* Brands Carousel Section */}
         <section className="brands-section">
           <h2 className="section-title">Las marcas que trabajamos</h2>
-          <div className="carousel-container brands-carousel">
-            <div className="carousel-track brands-track">
-              {/* Brand Logos as clickable links */}
-              {[
-                { name: "Apple", link: "#" },
-                { name: "ASUS", link: "#" },
-                { name: "MSI", link: "#" },
-                { name: "Lenovo", link: "#" },
-                { name: "HP", link: "#" },
-                { name: "Dell", link: "#" },
-                { name: "Acer", link: "#" },
-                { name: "Samsung", link: "#" }
-              ].map((brand, i) => (
-                <a key={i} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
-                  {brand.name}
-                </a>
-              ))}
-              {/* Duplicated for infinite loop */}
-              {[
-                { name: "Apple", link: "#" },
-                { name: "ASUS", link: "#" },
-                { name: "MSI", link: "#" },
-                { name: "Lenovo", link: "#" },
-                { name: "HP", link: "#" },
-                { name: "Dell", link: "#" },
-                { name: "Acer", link: "#" },
-                { name: "Samsung", link: "#" }
-              ].map((brand, i) => (
-                <a key={`dup-${i}`} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
-                  {brand.name}
-                </a>
-              ))}
+          <div 
+            className="brands-carousel-wrapper" 
+            onMouseEnter={() => isHovered.current = true} 
+            onMouseLeave={() => isHovered.current = false}
+          >
+            <button className="carousel-arrow left" onClick={() => scrollCarousel('left')} aria-label="Desplazar a la izquierda">
+              <ChevronLeft size={28} />
+            </button>
+            <div className="carousel-container brands-carousel" ref={carouselRef}>
+              <div className="brands-track">
+                {/* Brand Logos as clickable links */}
+                {BRANDS_LIST.map((brand, i) => {
+                  const domain = brand.iconDomain || new URL(brand.link).hostname;
+                  return (
+                    <a key={i} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+                      <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+                      {brand.name}
+                    </a>
+                  );
+                })}
+                {/* Duplicated for infinite loop */}
+                {BRANDS_LIST.map((brand, i) => {
+                  const domain = brand.iconDomain || new URL(brand.link).hostname;
+                  return (
+                    <a key={`dup-${i}`} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+                      <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+                      {brand.name}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
+            <button className="carousel-arrow right" onClick={() => scrollCarousel('right')} aria-label="Desplazar a la derecha">
+              <ChevronRight size={28} />
+            </button>
           </div>
+        </section>
+
+        {/* Features Text Section */}
+        <section className="features-text-section">
+          <motion.div 
+            className="features-statement-container"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } }
+            }}
+          >
+            <h2 className="features-statement">
+              <span className="statement-highlight">TU PUNTO</span> en un solo lugar. 
+              Servicio técnico, electrónica y redes. 
+              Expertos en tecnología y conectividad.<br className="statement-break" />
+              <span className="statement-highlight">REPARACIÓN</span> integral y segura. 
+              Atención a domicilio.<br className="statement-break" />
+              <span className="statement-highlight">SOLUCIONAMOS</span> de forma preventiva. 
+              Diagnóstico de fallas.<br className="statement-break" />
+              <span className="statement-highlight">TU MUNDO</span> digital, siempre operativo. 
+              Venta de accesorios <span className="statement-highlight">AL ALCANCE DE TU BOLSILLO</span>. 
+              Reciclado circular.
+            </h2>
+          </motion.div>
         </section>
 
         {/* Our Work Carousel */}
