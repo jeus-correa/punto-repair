@@ -65,6 +65,62 @@ const BRANDS_LIST = [
   { name: "Micron", link: "https://www.micron.com/" }
 ];
 
+const FEATURES_STATEMENT_LINES = [
+  {
+    segments: [
+      { highlight: true, text: 'TU PUNTO' },
+      {
+        highlight: false,
+        text: ' en un solo lugar. Servicio técnico, electrónica y redes. Expertos en tecnología y conectividad.',
+      },
+    ],
+  },
+  {
+    segments: [
+      { highlight: true, text: 'REPARACIÓN' },
+      { highlight: false, text: ' integral y segura. Atención a domicilio.' },
+    ],
+  },
+  {
+    segments: [
+      { highlight: true, text: 'SOLUCIONAMOS' },
+      { highlight: false, text: ' de forma preventiva. Diagnóstico de fallas.' },
+    ],
+  },
+  {
+    segments: [
+      { highlight: true, text: 'TU MUNDO' },
+      { highlight: false, text: ' digital, siempre operativo. Venta de accesorios ' },
+      { highlight: true, text: 'AL ALCANCE DE TU BOLSILLO' },
+      { highlight: false, text: '. Reciclado circular.' },
+    ],
+  },
+];
+
+const SYSTEMCD_WEB_URL = 'https://systemcd.cl/';
+
+const FOOTER_SERVICE_LINKS = [
+  { label: 'Página 1', href: SYSTEMCD_WEB_URL },
+  { label: 'Página 2', href: '#' },
+  { label: 'Página 3', href: '#' },
+];
+
+const FeaturesZoomStatement = () => (
+  <span className="features-statement-grid">
+    {FEATURES_STATEMENT_LINES.map((line, li) => (
+      <span key={li} className="statement-phrase">
+        <span className="statement-phrase-body">
+          {line.segments.map((seg, si) => (
+            <span key={si} className={seg.highlight ? 'statement-highlight' : undefined}>
+              {seg.text}
+            </span>
+          ))}
+        </span>
+      </span>
+    ))}
+  </span>
+);
+
 const SocialIcons = ({ size = 20, variant = 'default' }) => (
   <div className={`social-links-container ${variant === 'nav' ? 'social-links-nav' : ''}`}>
     <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Instagram">
@@ -268,7 +324,13 @@ function App() {
               </p>
             </div>
 
-            <div className="plan-card">
+            <a
+              href={SYSTEMCD_WEB_URL}
+              className="plan-card plan-card-external"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Desarrollo Web — abrir systemcd.cl"
+            >
               <div className="plan-icon">
                 <Globe size={40} />
               </div>
@@ -277,7 +339,7 @@ function App() {
                 Diseño y desarrollo de páginas web modernas, optimizadas y adaptadas a tu negocio.<br/><br/>
                 Creamos sitios informativos, catálogos o páginas de servicios con diseño profesional y enfoque en clientes.
               </p>
-            </div>
+            </a>
 
           </div>
         </section>
@@ -336,16 +398,7 @@ function App() {
             }}
           >
             <h2 className="features-statement">
-              <span className="statement-highlight">TU PUNTO</span> en un solo lugar. 
-              Servicio técnico, electrónica y redes. 
-              Expertos en tecnología y conectividad.<br className="statement-break" />
-              <span className="statement-highlight">REPARACIÓN</span> integral y segura. 
-              Atención a domicilio.<br className="statement-break" />
-              <span className="statement-highlight">SOLUCIONAMOS</span> de forma preventiva. 
-              Diagnóstico de fallas.<br className="statement-break" />
-              <span className="statement-highlight">TU MUNDO</span> digital, siempre operativo. 
-              Venta de accesorios <span className="statement-highlight">AL ALCANCE DE TU BOLSILLO</span>. 
-              Reciclado circular.
+              <FeaturesZoomStatement />
             </h2>
           </motion.div>
         </section>
@@ -414,6 +467,22 @@ function App() {
         <div className="email-contact">
           <Mail size={20} />
           <span>contacto@puntorepair.cl</span>
+        </div>
+        <div className="footer-other-services">
+          <h3 className="footer-other-title">Otros servicios</h3>
+          <div className="footer-page-links">
+            {FOOTER_SERVICE_LINKS.map((item) => (
+              <a
+                key={item.label}
+                className="btn-primary footer-page-link"
+                href={item.href}
+                target={item.href !== '#' ? '_blank' : undefined}
+                rel={item.href !== '#' ? 'noopener noreferrer' : undefined}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
     </>
