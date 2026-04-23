@@ -1,0 +1,67 @@
+.cyber-globe-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+  perspective: 1000px;
+}
+
+.globe-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.globe-svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(45, 91, 255, 0.2));
+  z-index: 2;
+}
+
+/* Backglow/Halo */
+.globe-halo {
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45, 91, 255, 0.15) 0%, rgba(45, 91, 255, 0) 70%);
+  box-shadow: 0 0 60px rgba(45, 91, 255, 0.1);
+  z-index: 1;
+}
+
+/* Scanline effect */
+.globe-scanline {
+  position: absolute;
+  width: 480px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(45, 91, 255, 0) 0%, rgba(45, 91, 255, 0.4) 50%, rgba(45, 91, 255, 0) 100%);
+  z-index: 3;
+  pointer-events: none;
+  animation: scanVertical 4s linear infinite;
+}
+
+@keyframes scanVertical {
+  0% { top: 10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .globe-container {
+    width: 300px;
+    height: 300px;
+  }
+  .globe-halo {
+    width: 280px;
+    height: 280px;
+  }
+  .globe-scanline {
+    width: 280px;
+  }
+}

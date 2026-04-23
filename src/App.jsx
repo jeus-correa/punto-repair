@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import CyberGlobeFeatures from './CyberGlobeFeatures';
 import CyberMap from './CyberMap';
 import { Monitor, ShieldCheck, Zap, Settings, CheckCircle2, Mail, Sun, Moon, ChevronLeft, ChevronRight, Globe, Wrench, Eye, Users, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -68,7 +69,7 @@ const BRANDS_LIST = [
 const FEATURES_STATEMENT_LINES = [
   {
     segments: [
-      { highlight: true, text: 'TU PUNTO' },
+      { highlight: true, text: 'TU PUNTO REPARACIÓN' },
       {
         highlight: false,
         text: ' en un solo lugar. Servicio técnico, electrónica y redes. Expertos en tecnología y conectividad.',
@@ -77,32 +78,32 @@ const FEATURES_STATEMENT_LINES = [
   },
   {
     segments: [
-      { highlight: true, text: 'REPARACIÓN' },
-      { highlight: false, text: ' integral y segura. Atención a domicilio.' },
-    ],
-  },
-  {
-    segments: [
       { highlight: true, text: 'SOLUCIONAMOS' },
-      { highlight: false, text: ' de forma preventiva. Diagnóstico de fallas.' },
+      { highlight: false, text: ' de forma preventiva y correctiva. Diagnóstico de fallas y reparación integral.' },
     ],
   },
   {
     segments: [
       { highlight: true, text: 'TU MUNDO' },
-      { highlight: false, text: ' digital, siempre operativo. Venta de accesorios ' },
+      { highlight: false, text: ' digital, siempre operativo. Soporte especializado para tu hogar o empresa.' },
+    ],
+  },
+  {
+    segments: [
       { highlight: true, text: 'AL ALCANCE DE TU BOLSILLO' },
-      { highlight: false, text: '. Reciclado circular.' },
+      { highlight: false, text: 'La mejor tecnología a precios competitivos con enfoque en reciclado circular.' },
     ],
   },
 ];
 
 const SYSTEMCD_WEB_URL = 'https://systemcd.cl/';
+const TUESPACIOIMPECABLE_WEB_URL = 'https://tuespacioimpecable.cl/';
+const NORAMBUENASERVICIOS_WEB_URL = 'https://norambuenaservicios.cl/';
 
 const FOOTER_SERVICE_LINKS = [
-  { label: 'Página 1', href: SYSTEMCD_WEB_URL },
-  { label: 'Página 2', href: '#' },
-  { label: 'Página 3', href: '#' },
+  { label: 'Desarrollo Web', href: SYSTEMCD_WEB_URL },
+  { label: 'Asesoramiento de limpieza', href: TUESPACIOIMPECABLE_WEB_URL },
+  { label: 'Entretención y logística', href: NORAMBUENASERVICIOS_WEB_URL },
 ];
 
 const FeaturesZoomStatement = () => (
@@ -123,16 +124,16 @@ const FeaturesZoomStatement = () => (
 
 const SocialIcons = ({ size = 20, variant = 'default' }) => (
   <div className={`social-links-container ${variant === 'nav' ? 'social-links-nav' : ''}`}>
-    <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Instagram">
+    <a href="https://www.instagram.com/punto_repair/" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Instagram">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
     </a>
     <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Facebook">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
     </a>
-    <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="WhatsApp">
+    <a href="https://wa.me/56990872747" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="WhatsApp">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
     </a>
-    <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="TikTok">
+    <a href="https://www.tiktok.com/@punto_repair?lang=es" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="TikTok">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
     </a>
   </div>
@@ -161,13 +162,13 @@ const AnimatedTitle = () => {
   );
 };
 
-const StatsBanner = () => {
+const StatsBanner = ({ visits }) => {
   return (
     <div className="stats-banner-wrapper">
       <div className="stats-banner">
         <div className="stat-item">
           <Eye size={36} className="stat-icon" />
-          <div className="stat-value">2,004</div>
+          <div className="stat-value">{visits > 0 ? visits.toLocaleString() : '2,004'}</div>
           <div className="stat-label">VISITAS</div>
         </div>
         <div className="stat-item">
@@ -177,7 +178,7 @@ const StatsBanner = () => {
         </div>
         <div className="stat-item">
           <Star size={36} className="stat-icon" />
-          <div className="stat-value">7.0</div>
+          <div className="stat-value">5.0</div>
           <div className="stat-label">CALIFICACIÓN</div>
         </div>
       </div>
@@ -188,30 +189,44 @@ const StatsBanner = () => {
 function App() {
   const [theme, setTheme] = useState('light');
   const [locationBlink, setLocationBlink] = useState(false);
+  const [visits, setVisits] = useState(0);
+  const [activeFeature, setActiveFeature] = useState(null);
   const carouselRef = useRef(null);
   const isHovered = useRef(false);
 
   useEffect(() => {
+    const savedVisits = localStorage.getItem('punto_repair_visits');
+    const baseVisits = 2004;
+    const currentVisits = savedVisits ? parseInt(savedVisits) : baseVisits;
+    const newVisits = currentVisits + 1;
+    localStorage.setItem('punto_repair_visits', newVisits.toString());
+    setVisits(newVisits);
+  }, []);
+
+  useEffect(() => {
     let animationId;
-    const scroll = () => {
+    const scrollHandler = () => {
       if (carouselRef.current && !isHovered.current) {
-        carouselRef.current.scrollLeft += 1;
+        // Very slow and smooth increment
+        carouselRef.current.scrollLeft += 0.8;
         
-        // Loop back seamlessly if scrolled past the first set of items
         if (carouselRef.current.scrollLeft >= carouselRef.current.scrollWidth / 2) {
           carouselRef.current.scrollLeft = 0;
         }
       }
-      animationId = requestAnimationFrame(scroll);
+      animationId = requestAnimationFrame(scrollHandler);
     };
-    animationId = requestAnimationFrame(scroll);
+    animationId = requestAnimationFrame(scrollHandler);
     return () => cancelAnimationFrame(animationId);
   }, []);
 
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
-      const scrollAmount = 500;
-      carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+      const scrollAmount = 400;
+      carouselRef.current.scrollBy({ 
+        left: direction === 'left' ? -scrollAmount : scrollAmount, 
+        behavior: 'smooth' 
+      });
     }
   };
 
@@ -222,6 +237,12 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (!section) return;
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const goToLocation = () => {
     const locationSection = document.getElementById('ubicacion');
@@ -247,7 +268,7 @@ function App() {
           <button className="theme-toggle" onClick={toggleTheme} title="Cambiar Tema">
             {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
           </button>
-          <button className="btn-primary">Habla con nosotros</button>
+          <button className="btn-primary" onClick={() => scrollToSection('servicios')}>nuestros servicios  </button>
         </div>
       </nav>
 
@@ -273,21 +294,25 @@ function App() {
             >
               Excelencia y Rapidez en Soporte Técnico.
             </motion.p>
-            <motion.div
-              className="hero-actions"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <button className="btn-primary">Contactar Soporte</button>
-            </motion.div>
+            <div className="hero-actions">
+              <button className="btn-primary" onClick={() => scrollToSection('contacto')}>contactar soporte </button>
+              <a 
+                href="https://drive.google.com/drive/folders/19kCj4W8wj2zNLXoXHGOdQ815pVt0ixXK?usp=sharing" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-primary"
+                style={{ textDecoration: 'none', textAlign: 'center' }}
+              >
+                gestor de soluciones
+              </a>
+            </div>
           </div>
         </section>
 
-        <StatsBanner />
+        <StatsBanner visits={visits} />
 
         {/* Services Section */}
-        <section className="plans-section">
+        <section id="servicios" className="plans-section">
           <h2 className="section-title">Nuestros Servicios</h2>
           <div className="plans-grid">
 
@@ -337,7 +362,8 @@ function App() {
               <h3 className="plan-name">Desarrollo Web</h3>
               <p className="service-text">
                 Diseño y desarrollo de páginas web modernas, optimizadas y adaptadas a tu negocio.<br/><br/>
-                Creamos sitios informativos, catálogos o páginas de servicios con diseño profesional y enfoque en clientes.
+                Creamos sitios informativos, catálogos o páginas de servicios con diseño profesional y enfoque en clientes.<br/><br/>
+                <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }}>Visitar Sitio</button>
               </p>
             </a>
 
@@ -348,12 +374,16 @@ function App() {
         <section className="brands-section">
           <h2 className="section-title">Las marcas que trabajamos</h2>
           <div 
-            className="brands-carousel-wrapper" 
-            onMouseEnter={() => isHovered.current = true} 
+            className="brands-carousel-wrapper"
+            onMouseEnter={() => isHovered.current = true}
             onMouseLeave={() => isHovered.current = false}
           >
-            <button className="carousel-arrow left" onClick={() => scrollCarousel('left')} aria-label="Desplazar a la izquierda">
-              <ChevronLeft size={28} />
+            <button 
+              className="carousel-arrow left" 
+              onClick={() => scrollCarousel('left')} 
+              aria-label="Desplazar a la izquierda"
+            >
+              <ChevronLeft size={24} />
             </button>
             <div className="carousel-container brands-carousel" ref={carouselRef}>
               <div className="brands-track">
@@ -379,28 +409,76 @@ function App() {
                 })}
               </div>
             </div>
-            <button className="carousel-arrow right" onClick={() => scrollCarousel('right')} aria-label="Desplazar a la derecha">
-              <ChevronRight size={28} />
+            <button 
+              className="carousel-arrow right" 
+              onClick={() => scrollCarousel('right')} 
+              aria-label="Desplazar a la derecha"
+            >
+              <ChevronRight size={24} />
             </button>
           </div>
         </section>
 
-        {/* Features Text Section */}
+        {/* Features Text Section with 3D Globe */}
         <section className="features-text-section">
-          <motion.div 
-            className="features-statement-container"
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              show: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } }
-            }}
-          >
-            <h2 className="features-statement">
-              <FeaturesZoomStatement />
-            </h2>
-          </motion.div>
+          <div className="features-layout-container">
+            
+            <div className="features-globe-grid">
+              {/* Left Side Features */}
+              <div className="features-column left">
+                {FEATURES_STATEMENT_LINES.slice(0, 2).map((line, idx) => (
+                  <motion.div 
+                    key={idx} 
+                    className="statement-phrase modern-card"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: idx * 0.2 }}
+                    onMouseEnter={() => setActiveFeature(idx)}
+                    onMouseLeave={() => setActiveFeature(null)}
+                  >
+                    <div className="statement-phrase-body">
+                      {line.segments.map((seg, sIdx) => (
+                        <span key={sIdx} className={seg.highlight ? 'statement-highlight' : 'statement-detail'}>
+                          {seg.text}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Central Globe */}
+              <div className="globe-center-area">
+                <h3 className="globe-center-title">Solucionamos tu mundo Punto Repair</h3>
+                <CyberGlobeFeatures activeFeature={activeFeature} />
+              </div>
+
+              {/* Right Side Features */}
+              <div className="features-column right">
+                {FEATURES_STATEMENT_LINES.slice(2, 4).map((line, idx) => (
+                  <motion.div 
+                    key={idx + 2} 
+                    className="statement-phrase modern-card"
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: (idx + 2) * 0.2 }}
+                    onMouseEnter={() => setActiveFeature(idx + 2)}
+                    onMouseLeave={() => setActiveFeature(null)}
+                  >
+                    <div className="statement-phrase-body">
+                      {line.segments.map((seg, sIdx) => (
+                        <span key={sIdx} className={seg.highlight ? 'statement-highlight' : 'statement-detail'}>
+                          {seg.text}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Our Work Carousel */}
@@ -408,37 +486,44 @@ function App() {
           <h2 className="section-title">Nuestro Trabajo</h2>
           <div className="carousel-container">
             <div className="carousel-track work-track">
-              {/* Default placeholders, user will replace with their own images later */}
+              {/* Mezcla de fotos reales y de stock funcionales */}
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build 1" />
+                <img src="/Images/puntorepair1.png" alt="Trabajo Punto Repair 1" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="PC Build 2" />
+                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1624704705307-b088bd396bb3?auto=format&fit=crop&w=600&q=80" alt="Hardware Repair" />
+                <img src="/Images/puntorepair2.png" alt="Trabajo Punto Repair 2" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1568283626989-13824bc8ef6e?auto=format&fit=crop&w=600&q=80" alt="GPU Repair" />
+                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="Gaming Setup" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Motherboard Fix" />
-              </div>
-              {/* Duplicated images for infinite marquee effect */}
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build 1" />
+                <img src="/Images/puntorepair3.png" alt="Trabajo Punto Repair 3" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="PC Build 2" />
+                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Technical Repair" />
+              </div>
+              
+              {/* Duplicadas para efecto de carrusel infinito */}
+              <div className="carousel-item">
+                <img src="/Images/puntorepair1.png" alt="Trabajo Punto Repair 1" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1624704705307-b088bd396bb3?auto=format&fit=crop&w=600&q=80" alt="Hardware Repair" />
+                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1568283626989-13824bc8ef6e?auto=format&fit=crop&w=600&q=80" alt="GPU Repair" />
+                <img src="/Images/puntorepair2.png" alt="Trabajo Punto Repair 2" />
               </div>
               <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Motherboard Fix" />
+                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="Gaming Setup" />
+              </div>
+              <div className="carousel-item">
+                <img src="/Images/puntorepair3.png" alt="Trabajo Punto Repair 3" />
+              </div>
+              <div className="carousel-item">
+                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Technical Repair" />
               </div>
             </div>
           </div>
@@ -461,12 +546,16 @@ function App() {
       </main>
 
       {/* Footer / Contact */}
-      <footer className="footer-section">
+      <footer id="contacto" className="footer-section">
         <h2 className="footer-title">Contáctanos</h2>
         <SocialIcons size={32} />
         <div className="email-contact">
           <Mail size={20} />
           <span>contacto@puntorepair.cl</span>
+        </div>
+        <div className="email-contact" style={{ marginTop: '10px' }}>
+          <Mail size={20} />
+          <span>michael_canalsm@hotmail.com</span>
         </div>
         <div className="footer-other-services">
           <h3 className="footer-other-title">Otros servicios</h3>
