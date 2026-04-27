@@ -91,12 +91,20 @@ export default function CyberMap({ onTargetClick }) {
     return () => clearInterval(interval);
   }, []);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const staticMapLayer = useMemo(() => (
     <ComposableMap
       projection="geoMercator"
       projectionConfig={{
-        scale: 1100,
-        center: [-80, -38] 
+        scale: isMobile ? 800 : 1100,
+        center: isMobile ? [-75, -40] : [-80, -38] 
       }}
       className="map-svg"
     >
@@ -111,7 +119,8 @@ export default function CyberMap({ onTargetClick }) {
                 geography={geo}
                 fill="var(--hud-bg)"
                 stroke="var(--accent)"
-                strokeWidth={1.5}
+                strokeWidth={isMobile ? 0.5 : 1.5}
+                strokeOpacity={isMobile ? 0.3 : 1}
                 style={{
                   default: { outline: "none" },
                   hover: { outline: "none" },

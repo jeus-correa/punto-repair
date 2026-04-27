@@ -5,6 +5,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 :root {
@@ -76,9 +77,9 @@ body {
 
 @media (max-width: 480px) {
   .navbar {
-    padding: 12px 15px;
-    flex-wrap: wrap;
-    gap: 10px;
+    padding: 10px 15px;
+    flex-wrap: nowrap;
+    gap: 5px;
   }
 }
 
@@ -103,18 +104,19 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .nav-brand {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: #0f172a;
   text-shadow: none;
-  margin-right: auto;
+  margin-right: 15px;
+  flex-shrink: 0;
 }
 
 @media (max-width: 480px) {
@@ -165,14 +167,19 @@ body {
   letter-spacing: 1.2px;
 }
 
-/* Social Icons */
 .social-links-container {
   display: flex;
-  gap: 15px;
+  gap: 10px;
 }
 
 .social-links-nav {
-  gap: 10px;
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .social-links-nav {
+    display: none; /* Hide social icons in nav on very small screens to save space */
+  }
 }
 
 .social-icon-link {
@@ -304,14 +311,16 @@ body {
 
 @media (max-width: 768px) {
   .simple-main-title {
-    font-size: 3rem;
+    font-size: 2.8rem;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
   .simple-main-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     letter-spacing: -1px;
+    text-align: center;
   }
 }
 
@@ -432,9 +441,21 @@ html[data-theme="light"] .simple-main-title {
 
 @media (max-width: 768px) {
   .stats-banner {
-    flex-direction: column;
-    padding: 24px;
-    gap: 24px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 20px;
+    gap: 15px;
+  }
+  
+  .stat-item {
+    flex: 1 1 30%;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-item {
+    flex: 1 1 45%;
   }
 }
 
@@ -960,10 +981,18 @@ html[data-theme="dark"] .globe-center-title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
   position: relative;
+  overflow: hidden;
   z-index: 10;
   backdrop-filter: blur(10px);
+}
+
+@media (max-width: 480px) {
+  .footer-section {
+    padding: 40px 20px;
+    gap: 20px;
+  }
 }
 
 .footer-other-services {

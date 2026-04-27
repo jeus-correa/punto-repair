@@ -127,7 +127,7 @@ const SocialIcons = ({ size = 20, variant = 'default' }) => (
     <a href="https://www.instagram.com/punto_repair/" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Instagram">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
     </a>
-    <a href="#" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Facebook">
+    <a href="https://www.facebook.com/profile.php?id=61562935890716" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Facebook">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
     </a>
     <a href="https://wa.me/56990872747" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="WhatsApp">
@@ -193,13 +193,20 @@ function App() {
   const [activeFeature, setActiveFeature] = useState(null);
   const carouselRef = useRef(null);
   const isHovered = useRef(false);
+  const hasCountedRef = useRef(false);
 
   useEffect(() => {
-    const savedVisits = localStorage.getItem('punto_repair_visits');
-    const baseVisits = 2004;
-    const currentVisits = savedVisits ? parseInt(savedVisits) : baseVisits;
-    const newVisits = currentVisits + 1;
-    localStorage.setItem('punto_repair_visits', newVisits.toString());
+    // Prevent StrictMode double-counting (React 18+ runs effects twice in dev)
+    if (hasCountedRef.current) return;
+    hasCountedRef.current = true;
+
+    const STORAGE_KEY = 'punto_repair_visits';
+    const BASE_VISITS = 2004;
+
+    // Read current count, increment +1, save, display
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const newVisits = (stored ? parseInt(stored, 10) : BASE_VISITS) + 1;
+    localStorage.setItem(STORAGE_KEY, newVisits.toString());
     setVisits(newVisits);
   }, []);
 
@@ -549,13 +556,10 @@ function App() {
       <footer id="contacto" className="footer-section">
         <h2 className="footer-title">Contáctanos</h2>
         <SocialIcons size={32} />
-        <div className="email-contact">
-          <Mail size={20} />
-          <span>contacto@puntorepair.cl</span>
-        </div>
+
         <div className="email-contact" style={{ marginTop: '10px' }}>
           <Mail size={20} />
-          <span>michael_canalsm@hotmail.com</span>
+          <span>mcanales@puntorepair.cl</span>
         </div>
         <div className="footer-other-services">
           <h3 className="footer-other-title">Otros servicios</h3>

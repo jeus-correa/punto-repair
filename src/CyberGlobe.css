@@ -65,3 +65,17 @@
     width: 280px;
   }
 }
+
+@media (max-width: 480px) {
+  .globe-container {
+    width: 240px;
+    height: 240px;
+  }
+  .globe-halo {
+    width: 220px;
+    height: 220px;
+  }
+  .globe-scanline {
+    width: 220px;
+  }
+}
