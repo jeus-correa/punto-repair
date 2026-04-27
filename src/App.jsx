@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import CyberGlobeFeatures from './CyberGlobeFeatures';
 import CyberMap from './CyberMap';
-import { Monitor, ShieldCheck, Zap, Settings, CheckCircle2, Mail, Sun, Moon, ChevronLeft, ChevronRight, Globe, Wrench, Eye, Users, Star } from 'lucide-react';
+import { Monitor, Zap, Mail, Sun, Moon, ChevronLeft, ChevronRight, Globe, Eye, Users, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './index.css';
 
@@ -106,23 +106,23 @@ const FOOTER_SERVICE_LINKS = [
   { label: 'Entretención y logística', href: NORAMBUENASERVICIOS_WEB_URL },
 ];
 
-const FeaturesZoomStatement = () => (
-  <span className="features-statement-grid">
-    {FEATURES_STATEMENT_LINES.map((line, li) => (
-      <span key={li} className="statement-phrase">
-        <span className="statement-phrase-body">
-          {line.segments.map((seg, si) => (
-            <span key={si} className={seg.highlight ? 'statement-highlight' : undefined}>
-              {seg.text}
-            </span>
-          ))}
-        </span>
-      </span>
-    ))}
-  </span>
-);
+/** Evita `new URL` en cada render del carrusel de marcas */
+const BRANDS_WITH_DOMAIN = BRANDS_LIST.map((b) => ({
+  ...b,
+  domain: b.iconDomain || new URL(b.link).hostname,
+}));
 
-const SocialIcons = ({ size = 20, variant = 'default' }) => (
+const WORK_SLIDES = [
+  { src: '/Images/puntorepair1.png', alt: 'Trabajo Punto Repair 1' },
+  { src: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80', alt: 'PC Build' },
+  { src: '/Images/puntorepair2.png', alt: 'Trabajo Punto Repair 2' },
+  { src: 'https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80', alt: 'Gaming Setup' },
+  { src: '/Images/puntorepair3.png', alt: 'Trabajo Punto Repair 3' },
+  { src: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80', alt: 'Technical Repair' },
+];
+
+const SocialIcons = memo(function SocialIcons({ size = 20, variant = 'default' }) {
+  return (
   <div className={`social-links-container ${variant === 'nav' ? 'social-links-nav' : ''}`}>
     <a href="https://www.instagram.com/punto_repair/" target="_blank" rel="noopener noreferrer" className={`social-icon-link ${variant === 'nav' ? 'social-icon-link-nav' : ''}`} title="Instagram">
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
@@ -137,9 +137,10 @@ const SocialIcons = ({ size = 20, variant = 'default' }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
     </a>
   </div>
-);
+  );
+});
 
-const AnimatedTitle = () => {
+const AnimatedTitle = memo(function AnimatedTitle() {
   return (
     <div className="simple-title-container">
       <motion.h1 
@@ -160,9 +161,9 @@ const AnimatedTitle = () => {
       </motion.p>
     </div>
   );
-};
+});
 
-const StatsBanner = ({ visits }) => {
+const StatsBanner = memo(function StatsBanner({ visits }) {
   return (
     <div className="stats-banner-wrapper">
       <div className="stats-banner">
@@ -184,7 +185,7 @@ const StatsBanner = ({ visits }) => {
       </div>
     </div>
   );
-};
+});
 
 function App() {
   const [theme, setTheme] = useState('light');
@@ -211,54 +212,88 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let animationId;
-    const scrollHandler = () => {
-      if (carouselRef.current && !isHovered.current) {
-        // Very slow and smooth increment
-        carouselRef.current.scrollLeft += 0.8;
-        
-        if (carouselRef.current.scrollLeft >= carouselRef.current.scrollWidth / 2) {
-          carouselRef.current.scrollLeft = 0;
+    let rafId = 0;
+    const tick = () => {
+      if (document.visibilityState === 'visible' && carouselRef.current && !isHovered.current) {
+        const el = carouselRef.current;
+        el.scrollLeft += 4;
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft = 0;
         }
       }
-      animationId = requestAnimationFrame(scrollHandler);
+      rafId = requestAnimationFrame(tick);
     };
-    animationId = requestAnimationFrame(scrollHandler);
-    return () => cancelAnimationFrame(animationId);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = 400;
-      carouselRef.current.scrollBy({ 
-        left: direction === 'left' ? -scrollAmount : scrollAmount, 
-        behavior: 'smooth' 
-      });
-    }
-  };
+  const scrollCarousel = useCallback((direction) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollBy({
+      left: direction === 'left' ? -400 : 400,
+      behavior: 'smooth',
+    });
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = useCallback((id) => {
     const section = document.getElementById(id);
     if (!section) return;
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  }, []);
 
-  const goToLocation = () => {
+  const goToLocation = useCallback(() => {
     const locationSection = document.getElementById('ubicacion');
     if (!locationSection) return;
 
     setLocationBlink(true);
     locationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     window.setTimeout(() => setLocationBlink(false), 1200);
-  };
+  }, []);
+
+  const handleBrandsMouseEnter = useCallback(() => {
+    isHovered.current = true;
+  }, []);
+  const handleBrandsMouseLeave = useCallback(() => {
+    isHovered.current = false;
+  }, []);
+
+  const setFeatureHover = useCallback((idx) => {
+    setActiveFeature(idx);
+  }, []);
+  const clearFeatureHover = useCallback(() => {
+    setActiveFeature(null);
+  }, []);
+
+  const brandsTrack = useMemo(
+    () => (
+      <>
+        {BRANDS_WITH_DOMAIN.map((brand) => (
+          <a key={brand.name} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+            <img src={`https://www.google.com/s2/favicons?domain=${brand.domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+            {brand.name}
+          </a>
+        ))}
+        {BRANDS_WITH_DOMAIN.map((brand) => (
+          <a key={`${brand.name}-dup`} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
+            <img src={`https://www.google.com/s2/favicons?domain=${brand.domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+            {brand.name}
+          </a>
+        ))}
+      </>
+    ),
+    []
+  );
+
+  const workSlidesDoubled = useMemo(() => [...WORK_SLIDES, ...WORK_SLIDES], []);
 
   return (
     <>
@@ -380,11 +415,7 @@ function App() {
         {/* Brands Carousel Section */}
         <section className="brands-section">
           <h2 className="section-title">Las marcas que trabajamos</h2>
-          <div 
-            className="brands-carousel-wrapper"
-            onMouseEnter={() => isHovered.current = true}
-            onMouseLeave={() => isHovered.current = false}
-          >
+          <div className="brands-carousel-wrapper" onMouseEnter={handleBrandsMouseEnter} onMouseLeave={handleBrandsMouseLeave}>
             <button 
               className="carousel-arrow left" 
               onClick={() => scrollCarousel('left')} 
@@ -441,8 +472,8 @@ function App() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: idx * 0.2 }}
-                    onMouseEnter={() => setActiveFeature(idx)}
-                    onMouseLeave={() => setActiveFeature(null)}
+                    onMouseEnter={() => setFeatureHover(idx)}
+                    onMouseLeave={clearFeatureHover}
                   >
                     <div className="statement-phrase-body">
                       {line.segments.map((seg, sIdx) => (
@@ -471,8 +502,8 @@ function App() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: (idx + 2) * 0.2 }}
-                    onMouseEnter={() => setActiveFeature(idx + 2)}
-                    onMouseLeave={() => setActiveFeature(null)}
+                    onMouseEnter={() => setFeatureHover(idx + 2)}
+                    onMouseLeave={clearFeatureHover}
                   >
                     <div className="statement-phrase-body">
                       {line.segments.map((seg, sIdx) => (
@@ -493,45 +524,11 @@ function App() {
           <h2 className="section-title">Nuestro Trabajo</h2>
           <div className="carousel-container">
             <div className="carousel-track work-track">
-              {/* Mezcla de fotos reales y de stock funcionales */}
-              <div className="carousel-item">
-                <img src="/Images/puntorepair1.png" alt="Trabajo Punto Repair 1" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build" />
-              </div>
-              <div className="carousel-item">
-                <img src="/Images/puntorepair2.png" alt="Trabajo Punto Repair 2" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="Gaming Setup" />
-              </div>
-              <div className="carousel-item">
-                <img src="/Images/puntorepair3.png" alt="Trabajo Punto Repair 3" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Technical Repair" />
-              </div>
-              
-              {/* Duplicadas para efecto de carrusel infinito */}
-              <div className="carousel-item">
-                <img src="/Images/puntorepair1.png" alt="Trabajo Punto Repair 1" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80" alt="PC Build" />
-              </div>
-              <div className="carousel-item">
-                <img src="/Images/puntorepair2.png" alt="Trabajo Punto Repair 2" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80" alt="Gaming Setup" />
-              </div>
-              <div className="carousel-item">
-                <img src="/Images/puntorepair3.png" alt="Trabajo Punto Repair 3" />
-              </div>
-              <div className="carousel-item">
-                <img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" alt="Technical Repair" />
-              </div>
+              {workSlidesDoubled.map((slide, i) => (
+                <div key={`${slide.src}-${i}`} className="carousel-item">
+                  <img src={slide.src} alt={slide.alt} loading="lazy" decoding="async" />
+                </div>
+              ))}
             </div>
           </div>
         </section>

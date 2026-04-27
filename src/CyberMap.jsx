@@ -36,6 +36,9 @@ const generateRandomOriginViewport = () => {
 };
 
 export default function CyberMap({ onTargetClick }) {
+  const handleTargetActivate = () => {
+    onTargetClick?.();
+  };
   const [activeConnections, setActiveConnections] = useState([]);
   const [targetPoint, setTargetPoint] = useState({ x: window.innerWidth * 0.58, y: window.innerHeight * 0.52 });
   const markerRef = useRef(null);
@@ -145,13 +148,23 @@ export default function CyberMap({ onTargetClick }) {
           r={4}
           fill="var(--accent)"
           className="target-clickable-point"
+          role="button"
+          tabIndex={0}
+          aria-label="Ir a ubicación"
           animate={{ opacity: [1, 0.5, 1] }}
           transition={{ duration: 0.8, repeat: Infinity }}
-          style={{ filter: "drop-shadow(0 0 10px var(--accent))" }}
+          style={{ filter: "drop-shadow(0 0 10px var(--accent))", cursor: 'pointer' }}
+          onClick={handleTargetActivate}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTargetActivate();
+            }
+          }}
         />
       </Marker>
     </ComposableMap>
-  ), []);
+  ), [isMobile]);
 
   return (
     <div className="cyber-map-container">

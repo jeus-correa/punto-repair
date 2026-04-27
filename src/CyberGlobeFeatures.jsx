@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { motion, AnimatePresence } from 'framer-motion';
 import './CyberGlobe.css';
@@ -11,7 +11,6 @@ const chileCoords = [-71.2858, -34.9828];
 export default function CyberGlobeFeatures({ activeFeature }) {
   const [rotation, setRotation] = useState([0, -20]);
   const [isHovering, setIsHovering] = useState(false);
-  const requestRef = useRef();
 
   // Auto-rotation effect (Wobble instead of full spin)
   const baseLon = 71.3;
@@ -22,18 +21,20 @@ export default function CyberGlobeFeatures({ activeFeature }) {
     const startTime = Date.now() - 5000; // Offset start so it doesn't always start at 0
     
     const animate = () => {
-      if (!isHovering) {
-        // Gentle wobble side to side (+/- 25 degrees)
-        const elapsed = Date.now() - startTime;
-        const wobble = Math.sin(elapsed / 2000) * 25; 
-        setRotation([baseLon + wobble, baseLat]);
-      } else {
-        // Smoothly return exactly to the center of Chile when hovering
-        setRotation(prev => {
-           const newLon = prev[0] + (baseLon - prev[0]) * 0.08;
-           const newLat = prev[1] + (baseLat - prev[1]) * 0.08;
-           return [newLon, newLat];
-        });
+      if (document.visibilityState === 'visible') {
+        if (!isHovering) {
+          // Gentle wobble side to side (+/- 25 degrees)
+          const elapsed = Date.now() - startTime;
+          const wobble = Math.sin(elapsed / 2000) * 25;
+          setRotation([baseLon + wobble, baseLat]);
+        } else {
+          // Smoothly return exactly to the center of Chile when hovering
+          setRotation((prev) => {
+            const newLon = prev[0] + (baseLon - prev[0]) * 0.08;
+            const newLat = prev[1] + (baseLat - prev[1]) * 0.08;
+            return [newLon, newLat];
+          });
+        }
       }
       animationId = requestAnimationFrame(animate);
     };
