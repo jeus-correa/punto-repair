@@ -487,6 +487,122 @@ html[data-theme="light"] .simple-main-title {
   text-transform: uppercase;
 }
 
+/* Animated Visitor Counter Glassmorphism */
+.visitor-counter-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 40px 0;
+  padding: 0 20px;
+}
+
+.systemcd-credit {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+}
+
+.glass-counter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 12px 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+  width: fit-content;
+  max-width: 100%;
+}
+
+html[data-theme='light'] .glass-counter-bar {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(45, 91, 255, 0.1);
+}
+
+.counter-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.counter-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.counter-divider {
+  width: 1px;
+  height: 30px;
+  background: rgba(45, 91, 255, 0.2);
+}
+
+.counter-icon {
+  color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent-glow));
+}
+
+.counter-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: 'Inter', 'Montserrat', sans-serif;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.counter-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .glass-counter-bar {
+    gap: 20px;
+    padding: 10px 20px;
+  }
+  
+  .counter-number {
+    font-size: 1.2rem;
+  }
+  
+  .counter-divider {
+    height: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-counter-bar {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .counter-divider {
+    width: 80%;
+    height: 1px;
+  }
+  
+  .counter-item {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Plans Section */
 .section-title {
   text-align: center;
@@ -965,10 +1081,25 @@ html[data-theme="dark"] .globe-center-title {
 
 @media (max-width: 480px) {
   .brand-logo.marquee-item {
-    min-width: 150px;
-    height: 60px;
-    font-size: 1.1rem;
+    min-width: 130px;
+    height: 50px;
+    font-size: 0.9rem;
     padding: 0 10px;
+    gap: 8px;
+  }
+  
+  .brand-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .brands-track {
+    gap: 20px;
+    padding: 10px 20px;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
   }
 }
 

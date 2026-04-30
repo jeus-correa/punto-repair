@@ -17,7 +17,7 @@ const BRANDS_LIST = [
   { name: "LG", link: "https://www.lg.com/cl/" },
   { name: "Intel", link: "https://www.intel.com/" },
   { name: "AMD", link: "https://www.amd.com/es" },
-  { name: "eMachines", link: "https://www.emachines.com/" },
+  { name: "eMachines", link: "https://emachinesus.com/", customIcon: "/Images/EMachines_stacked.png" },
   { name: "NVIDIA", link: "https://www.nvidia.com/es-la/" },
   { name: "Kingston", link: "https://www.kingston.com/es" },
   { name: "Western Digital", link: "https://www.westerndigital.com/es-cl" },
@@ -51,7 +51,7 @@ const BRANDS_LIST = [
   { name: "Ricoh", link: "https://www.ricoh.com/" },
   { name: "D-Link", link: "https://www.dlink.com/" },
   { name: "Linux", link: "https://www.linux.org/" },
-  { name: "Fujitel", link: "https://www.rcl.cl/brand/19-fujitel", iconDomain: "fujitel.cl" },
+  { name: "Fujitel", link: "https://www.rcl.cl/brand/19-fujitel", customIcon: "/Images/logo_fujitel.jpg" },
   { name: "Master-G", link: "https://www.masterg.cl/" },
   { name: "Maxwell", link: "https://maxwell.com/" },
   { name: "Motorola", link: "https://www.motorola.cl/" },
@@ -163,53 +163,137 @@ const AnimatedTitle = memo(function AnimatedTitle() {
   );
 });
 
-const StatsBanner = memo(function StatsBanner({ visits }) {
+import { db } from './firebase';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  onSnapshot, 
+  runTransaction, 
+  serverTimestamp 
+} from 'firebase/firestore';
+
+const AnimatedVisitorCounter = () => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const hasIncremented = useRef(false);
+  const initialBaseValue = 2004;
+  const duration = 2000;
+
+  useEffect(() => {
+    // 1. Escuchar el contador global en tiempo real
+    const unsubscribe = onSnapshot(doc(db, "stats", "totals"), (docSnap) => {
+      if (docSnap.exists()) {
+        setTotalCount(docSnap.data().count || initialBaseValue);
+      } else {
+        setDoc(doc(db, "stats", "totals"), { count: initialBaseValue }, { merge: true });
+        setTotalCount(initialBaseValue);
+      }
+    });
+
+    // 2. Incrementar el contador en cada carga/refresco
+    const incrementCounter = async () => {
+      if (hasIncremented.current) return;
+      hasIncremented.current = true;
+
+      try {
+        const statsRef = doc(db, "stats", "totals");
+        await runTransaction(db, async (transaction) => {
+          const statsSnap = await transaction.get(statsRef);
+          let newCount = initialBaseValue + 1;
+          
+          if (statsSnap.exists()) {
+            newCount = (statsSnap.data().count || initialBaseValue) + 1;
+          }
+          
+          transaction.set(statsRef, { count: newCount }, { merge: true });
+        });
+      } catch (error) {
+        console.error("Error al incrementar el contador:", error);
+      }
+    };
+
+    incrementCounter();
+    return () => unsubscribe();
+  }, []);
+
+  // Animación del número
+  useEffect(() => {
+    if (totalCount === 0) return;
+
+    let startTimestamp = null;
+    const startValue = displayValue;
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+    
+    const animate = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = timestamp - startTimestamp;
+      const percentage = Math.min(progress / duration, 1);
+      
+      const easedPercentage = easeOutCubic(percentage);
+      const nextValue = Math.floor(startValue + (totalCount - startValue) * easedPercentage);
+      
+      setDisplayValue(nextValue);
+
+      if (percentage < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(totalCount);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [totalCount]);
+
   return (
-    <div className="stats-banner-wrapper">
-      <div className="stats-banner">
-        <div className="stat-item">
-          <Eye size={36} className="stat-icon" />
-          <div className="stat-value">{visits > 0 ? visits.toLocaleString() : '2,004'}</div>
-          <div className="stat-label">VISITAS</div>
+    <div className="visitor-counter-container">
+      <div className="glass-counter-bar">
+        <div className="counter-item">
+          <Users size={24} className="counter-icon" />
+          <div className="counter-text">
+            <h2 className="counter-number">{displayValue.toLocaleString()}</h2>
+            <span className="counter-label">Visitas</span>
+          </div>
         </div>
-        <div className="stat-item">
-          <Users size={36} className="stat-icon" />
-          <div className="stat-value">300+</div>
-          <div className="stat-label">CLIENTES FELICES</div>
+        
+        <div className="counter-divider" />
+        
+        <div className="counter-item">
+          <Users size={24} className="counter-icon" />
+          <div className="counter-text">
+            <h2 className="counter-number">200+</h2>
+            <span className="counter-label">Clientes felices</span>
+          </div>
         </div>
-        <div className="stat-item">
-          <Star size={36} className="stat-icon" />
-          <div className="stat-value">5.0</div>
-          <div className="stat-label">CALIFICACIÓN</div>
+        
+        <div className="counter-divider" />
+        
+        <div className="counter-item">
+          <Star size={24} className="counter-icon" />
+          <div className="counter-text">
+            <h2 className="counter-number">5.0</h2>
+            <span className="counter-label">Calificación</span>
+          </div>
         </div>
       </div>
     </div>
   );
-});
+};
+
+const StatsBanner = () => {
+  return (
+    <div className="stats-banner-wrapper">
+      <AnimatedVisitorCounter />
+    </div>
+  );
+};
 
 function App() {
   const [theme, setTheme] = useState('light');
   const [locationBlink, setLocationBlink] = useState(false);
-  const [visits, setVisits] = useState(0);
   const [activeFeature, setActiveFeature] = useState(null);
   const carouselRef = useRef(null);
   const isHovered = useRef(false);
-  const hasCountedRef = useRef(false);
-
-  useEffect(() => {
-    // Prevent StrictMode double-counting (React 18+ runs effects twice in dev)
-    if (hasCountedRef.current) return;
-    hasCountedRef.current = true;
-
-    const STORAGE_KEY = 'punto_repair_visits';
-    const BASE_VISITS = 2004;
-
-    // Read current count, increment +1, save, display
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const newVisits = (stored ? parseInt(stored, 10) : BASE_VISITS) + 1;
-    localStorage.setItem(STORAGE_KEY, newVisits.toString());
-    setVisits(newVisits);
-  }, []);
 
   useEffect(() => {
     let rafId = 0;
@@ -297,6 +381,9 @@ function App() {
 
   return (
     <>
+      <div className="systemcd-credit" style={{ textAlign: 'center', padding: '10px 0', background: 'var(--bg)', borderBottom: '1px solid var(--nav-border)' }}>
+        Desarrollado por systemcd
+      </div>
       <CyberMap onTargetClick={goToLocation} />
       
       {/* Navigation */}
@@ -351,7 +438,7 @@ function App() {
           </div>
         </section>
 
-        <StatsBanner visits={visits} />
+        <StatsBanner />
 
         {/* Services Section */}
         <section id="servicios" className="plans-section">
@@ -428,9 +515,10 @@ function App() {
                 {/* Brand Logos as clickable links */}
                 {BRANDS_LIST.map((brand, i) => {
                   const domain = brand.iconDomain || new URL(brand.link).hostname;
+                  const iconSrc = brand.customIcon || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
                   return (
                     <a key={i} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
-                      <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+                      <img src={iconSrc} alt={`${brand.name} logo`} className="brand-icon" />
                       {brand.name}
                     </a>
                   );
@@ -438,9 +526,10 @@ function App() {
                 {/* Duplicated for infinite loop */}
                 {BRANDS_LIST.map((brand, i) => {
                   const domain = brand.iconDomain || new URL(brand.link).hostname;
+                  const iconSrc = brand.customIcon || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
                   return (
                     <a key={`dup-${i}`} href={brand.link} className="brand-logo marquee-item" target="_blank" rel="noopener noreferrer">
-                      <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`} alt={`${brand.name} logo`} className="brand-icon" />
+                      <img src={iconSrc} alt={`${brand.name} logo`} className="brand-icon" />
                       {brand.name}
                     </a>
                   );
@@ -575,6 +664,9 @@ function App() {
           </div>
         </div>
       </footer>
+      <div className="systemcd-credit" style={{ textAlign: 'center', padding: '20px 0', background: 'var(--bg)', borderTop: '1px solid var(--nav-border)' }}>
+        Desarrollado por systemcd
+      </div>
     </>
   );
 }
