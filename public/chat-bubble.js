@@ -1,7 +1,7 @@
-(function() {
+(function () {
     // Configuration
     const WORKER_URL = 'https://chatbot.ryu7w7123.workers.dev'; // Same Worker for both
-    
+
     // Configuración específica para Punto Repair
     const BOT_ID = 'repair';
     const BOT_NAME = 'Mr.Repair';
@@ -11,88 +11,93 @@
     const styles = `
         #support-chat-bubble-container {
             position: fixed;
-            bottom: 20px;
-            right: -60px; /* Más metido hacia el borde */
-            width: 160px;
-            height: 160px;
+            bottom: 30px;
+            right: 30px;
+            width: 100px;
+            height: 100px;
             z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Tooltip / Mensaje flotante */
-        #support-chat-tooltip {
-            position: absolute;
-            top: 20px;
-            right: 100px;
-            background: #1a1a1a;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 18px;
-            font-size: 13px;
-            font-weight: 500;
-            white-space: nowrap;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            pointer-events: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.5s ease;
-            z-index: 10001;
-            font-family: 'Inter', sans-serif;
-        }
-
-        #support-chat-tooltip::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 6px 0 6px 6px;
-            border-style: solid;
-            border-color: transparent transparent transparent #1a1a1a;
-        }
-
-        /* Animación del Tooltip */
-        @keyframes tooltip-fade {
-            0%, 10%, 90%, 100% { opacity: 0; transform: translateY(10px) translateX(0); }
-            20%, 80% { opacity: 1; transform: translateY(0) translateX(-10px); }
-        }
-
-        #support-chat-bubble-container.active-tooltip #support-chat-tooltip {
-            animation: tooltip-fade 8s infinite;
-        }
-
-        /* Ocultar el botón azul anterior */
+        /* El Botón Circular Premium (Capa Superior) */
         #support-chat-bubble {
-            display: none;
-        }
-
-        /* El Robot 3D como Único Trigger */
-        .bot-img-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 1;
-            pointer-events: auto;
+            width: 85px;
+            height: 85px;
+            background: radial-gradient(circle at 30% 30%, #4facfe 0%, #0070f3 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 112, 243, 0.5), 
+                        inset 0 4px 8px rgba(255, 255, 255, 0.3);
+            z-index: 5;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #support-chat-bubble::after {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 15%;
+            width: 70%;
+            height: 30%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #support-chat-bubble svg {
+            width: 35px;
+            height: 35px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            z-index: 6;
+        }
+
+        /* El Robot 3D (Capa Inferior - Escondido) */
+        .bot-img-wrapper {
+            position: absolute;
+            width: 85px; /* Mismo tamaño que el botón */
+            height: 85px;
+            z-index: 1;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(0) scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .bot-img {
-            width: 100%;
-            height: 100%;
+            width: 140%; /* Un poco más grande para que se note al asomarse */
+            height: 140%;
             object-fit: contain;
-            filter: drop-shadow(-5px 10px 20px rgba(0,0,0,0.15));
+            mix-blend-mode: multiply;
         }
 
-        #support-chat-bubble-container:hover {
-            transform: translateX(-20px); /* Se asoma un poco más en hover */
+        /* Hover: El robot se asoma desde atrás */
+        #support-chat-bubble-container:hover .bot-img-wrapper {
+            transform: translateY(-55px) scale(1.1); /* Sube hacia arriba */
+            opacity: 1;
+        }
+
+        #support-chat-bubble-container:hover #support-chat-bubble {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 112, 243, 0.6);
+        }
+
+        /* Animación Idle sutil */
+        @keyframes subtle-peek {
+            0%, 100% { transform: translateY(0) scale(0.9); opacity: 0; }
+            50% { transform: translateY(-5px) scale(0.92); opacity: 0.3; }
+        }
+        #support-chat-bubble-container:not(:hover) .bot-img-wrapper {
+            animation: subtle-peek 4s infinite ease-in-out;
         }
 
         #support-chat-container {
@@ -290,9 +295,11 @@
     bubbleContainer.innerHTML = `
         <div id="support-chat-tooltip">Hola, soy Mr. Repair. ¡Haz clic para ayudarte!</div>
         <div class="bot-img-wrapper">
-            <img src="/Images/bot_peeking.png" class="bot-img" alt="Bot">
+            <img src="Images/premium_bot.png" class="bot-img" alt="Bot">
         </div>
-        <div id="support-chat-bubble"></div>
+        <div id="support-chat-bubble">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
     `;
     document.body.appendChild(bubbleContainer);
 
@@ -301,7 +308,7 @@
     container.id = 'support-chat-container';
     container.innerHTML = `
         <div id="support-chat-character-area">
-            <img src="/Images/bot2.png" alt="Bot Character">
+            <img src="Images/bot2.png" alt="Bot Character">
         </div>
         <div id="support-chat-window">
             <div id="support-chat-header">
@@ -344,7 +351,7 @@
 
     closeBtn.addEventListener('click', () => {
         container.classList.remove('active');
-        setTimeout(() => { 
+        setTimeout(() => {
             container.style.display = 'none';
             bubbleContainer.style.display = 'flex';
         }, 400);
@@ -372,14 +379,14 @@
             const response = await fetch(`${WORKER_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     messages: chatHistory,
                     bot_id: BOT_ID
                 })
             });
             const data = await response.json();
             const botMessage = data.choices[0].message.content;
-            
+
             addMessage('bot', botMessage);
             chatHistory.push({ role: 'assistant', content: botMessage });
         } catch (error) {
