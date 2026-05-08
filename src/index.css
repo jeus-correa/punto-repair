@@ -178,7 +178,8 @@ body {
 
 @media (max-width: 480px) {
   .social-links-nav {
-    display: none; /* Hide social icons in nav on very small screens to save space */
+    display: none;
+    /* Hide social icons in nav on very small screens to save space */
   }
 }
 
@@ -303,7 +304,8 @@ body {
 .simple-main-title {
   font-size: 4.5rem;
   font-weight: 900;
-  color: #000000; /* As user requested "en negro" */
+  color: #000000;
+  /* As user requested "en negro" */
   line-height: 1;
   letter-spacing: -2px;
   margin: 0;
@@ -329,11 +331,13 @@ body {
    I'll use var(--text) for now, but force black if they meant pure black. 
    Actually, "en negro" means they really just want it solid dark. Let's use var(--text) so it works logically in both themes, but remove the gradient. */
 html[data-theme="dark"] .simple-main-title {
-  color: #ffffff; /* Just in case they toggle dark mode, pure black is invisible */
+  color: #ffffff;
+  /* Just in case they toggle dark mode, pure black is invisible */
 }
 
 html[data-theme="light"] .simple-main-title {
-  color: #000000; /* Pure black for light mode */
+  color: #000000;
+  /* Pure black for light mode */
 }
 
 .simple-subtitle {
@@ -400,7 +404,7 @@ html[data-theme="light"] .simple-main-title {
     align-items: center;
     width: 100%;
   }
-  
+
   .hero-actions .btn-primary {
     width: 100%;
     max-width: 300px;
@@ -412,7 +416,8 @@ html[data-theme="light"] .simple-main-title {
   display: flex;
   justify-content: center;
   padding: 0 50px 60px;
-  margin-top: -40px; /* Pull it slightly up into the hero */
+  margin-top: -40px;
+  /* Pull it slightly up into the hero */
   position: relative;
   z-index: 20;
 }
@@ -446,7 +451,7 @@ html[data-theme="light"] .simple-main-title {
     padding: 20px;
     gap: 15px;
   }
-  
+
   .stat-item {
     flex: 1 1 30%;
     min-width: 100px;
@@ -574,11 +579,11 @@ html[data-theme='light'] .glass-counter-bar {
     gap: 20px;
     padding: 10px 20px;
   }
-  
+
   .counter-number {
     font-size: 1.2rem;
   }
-  
+
   .counter-divider {
     height: 25px;
   }
@@ -591,12 +596,12 @@ html[data-theme='light'] .glass-counter-bar {
     width: 100%;
     max-width: 280px;
   }
-  
+
   .counter-divider {
     width: 80%;
     height: 1px;
   }
-  
+
   .counter-item {
     width: 100%;
     justify-content: center;
@@ -791,8 +796,13 @@ a.plan-card-external {
 }
 
 @keyframes scrollWork {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .carousel-item {
@@ -943,13 +953,14 @@ html[data-theme="dark"] .globe-center-title {
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  
-  .features-column.left, .features-column.right {
+
+  .features-column.left,
+  .features-column.right {
     text-align: center;
     align-items: center;
     order: 2;
   }
-  
+
   .globe-center-area {
     order: 1;
   }
@@ -1026,12 +1037,12 @@ html[data-theme="dark"] .globe-center-title {
   box-shadow: 0 12px 40px var(--accent-glow);
 }
 
-.carousel-arrow.left { 
-  left: 10px; 
+.carousel-arrow.left {
+  left: 10px;
 }
 
-.carousel-arrow.right { 
-  right: 10px; 
+.carousel-arrow.right {
+  right: 10px;
 }
 
 .brands-track {
@@ -1069,7 +1080,7 @@ html[data-theme="dark"] .globe-center-title {
   width: 32px;
   height: 32px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .brand-logo.marquee-item:hover {
@@ -1087,17 +1098,17 @@ html[data-theme="dark"] .globe-center-title {
     padding: 0 10px;
     gap: 8px;
   }
-  
+
   .brand-icon {
     width: 24px;
     height: 24px;
   }
-  
+
   .brands-track {
     gap: 20px;
     padding: 10px 20px;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
@@ -1153,24 +1164,24 @@ html[data-theme="dark"] .globe-center-title {
   gap: 12px 14px;
 }
 
+a.footer-page-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+}
+
 @media (max-width: 480px) {
   .footer-page-links {
     flex-direction: column;
     align-items: center;
     width: 100%;
   }
-  
-  .footer-page-links a {
-    width: 100%;
-  }
-}
 
-a.footer-page-link {
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 118px;
+  .footer-page-links a {
+    width: 100% !important;
+  }
 }
 
 .location-section {
@@ -1208,24 +1219,53 @@ a.footer-page-link {
 }
 
 @keyframes blinkPoint {
-  0% { box-shadow: 0 0 0 0 rgba(45, 91, 255, 0.6); opacity: 1; }
-  60% { box-shadow: 0 0 0 10px rgba(45, 91, 255, 0); opacity: 0.55; }
-  100% { box-shadow: 0 0 0 0 rgba(45, 91, 255, 0); opacity: 1; }
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 91, 255, 0.6);
+    opacity: 1;
+  }
+
+  60% {
+    box-shadow: 0 0 0 10px rgba(45, 91, 255, 0);
+    opacity: 0.55;
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 91, 255, 0);
+    opacity: 1;
+  }
 }
 
 @keyframes locationBlink {
-  0%, 100% { background: var(--section-bg-accent); }
-  30%, 70% { background: rgba(45, 91, 255, 0.16); }
+
+  0%,
+  100% {
+    background: var(--section-bg-accent);
+  }
+
+  30%,
+  70% {
+    background: rgba(45, 91, 255, 0.16);
+  }
 }
 
 @keyframes scrollWork {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes scrollBrands {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .background-map-point {
@@ -1261,8 +1301,15 @@ a.footer-page-link {
 }
 
 @keyframes targetPulse {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 
 
@@ -1308,4 +1355,122 @@ a.footer-page-link {
   font-weight: 600;
   margin-top: 10px;
   letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.email-contact:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+/* Promo Buttons Section */
+.promo-buttons-section {
+  padding: 20px 50px 40px;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.promo-buttons-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+}
+
+.promo-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.promo-btn {
+  width: 100%;
+  text-decoration: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.promo-btn.vende {
+  background: linear-gradient(135deg, var(--accent) 0%, #1e4bd6 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 10px 20px rgba(45, 91, 255, 0.2);
+}
+
+.promo-btn.cotiza {
+  background: rgba(45, 91, 255, 0.05);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  backdrop-filter: blur(10px);
+}
+
+.promo-btn:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 25px var(--accent-glow);
+}
+
+.promo-btn.vende:hover {
+  filter: brightness(1.1);
+}
+
+.promo-btn.cotiza:hover {
+  background: rgba(45, 91, 255, 0.1);
+}
+
+.promo-icon {
+  transition: transform 0.3s ease;
+}
+
+.promo-btn:hover .promo-icon {
+  transform: scale(1.2) rotate(10deg);
+}
+
+.promo-email {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
+
+.promo-email:hover {
+  color: var(--accent);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .promo-buttons-section {
+    padding: 10px 20px 30px;
+  }
+
+  .promo-buttons-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .promo-btn {
+    font-size: 0.9rem;
+    padding: 12px 20px;
+    min-height: 50px;
+  }
 }

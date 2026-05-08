@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import CyberGlobeFeatures from './CyberGlobeFeatures';
 import CyberMap from './CyberMap';
-import { Monitor, Zap, Mail, Sun, Moon, ChevronLeft, ChevronRight, Globe, Eye, Users, Star } from 'lucide-react';
+import { Monitor, Zap, Mail, Phone, Sun, Moon, ChevronLeft, ChevronRight, Globe, Eye, Users, Star, Tag, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './index.css';
 
@@ -168,6 +168,8 @@ import {
   doc, 
   getDoc, 
   setDoc, 
+  updateDoc,
+  increment,
   onSnapshot, 
   runTransaction, 
   serverTimestamp 
@@ -184,8 +186,10 @@ const AnimatedVisitorCounter = () => {
     // 1. Escuchar el contador global en tiempo real
     const unsubscribe = onSnapshot(doc(db, "stats", "totals"), (docSnap) => {
       if (docSnap.exists()) {
-        setTotalCount(docSnap.data().count || initialBaseValue);
+        const dbCount = docSnap.data().count;
+        setTotalCount(dbCount !== undefined ? dbCount : initialBaseValue);
       } else {
+        // Solo si realmente no existe, inicializamos con el valor base
         setDoc(doc(db, "stats", "totals"), { count: initialBaseValue }, { merge: true });
         setTotalCount(initialBaseValue);
       }
@@ -197,17 +201,15 @@ const AnimatedVisitorCounter = () => {
       hasIncremented.current = true;
 
       try {
-        const statsRef = doc(db, "stats", "totals");
-        await runTransaction(db, async (transaction) => {
-          const statsSnap = await transaction.get(statsRef);
-          let newCount = initialBaseValue + 1;
-          
-          if (statsSnap.exists()) {
-            newCount = (statsSnap.data().count || initialBaseValue) + 1;
-          }
-          
-          transaction.set(statsRef, { count: newCount }, { merge: true });
-        });
+        const docRef = doc(db, "stats", "totals");
+        try {
+          await updateDoc(docRef, {
+            count: increment(1)
+          });
+        } catch (e) {
+          // Si el documento no existe, lo creamos con el valor inicial + 1
+          await setDoc(docRef, { count: initialBaseValue + 1 }, { merge: true });
+        }
       } catch (error) {
         console.error("Error al incrementar el contador:", error);
       }
@@ -440,6 +442,35 @@ function App() {
 
         <StatsBanner />
 
+        <section className="promo-buttons-section">
+          <div className="promo-buttons-container">
+            <div className="promo-card">
+              <a 
+                href="https://drive.google.com/drive/folders/1lEYC-nQcYhD2WKUWtHengVqfbJU7jVDb?usp=sharing" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="promo-btn vende"
+              >
+                <Tag size={20} className="promo-icon" />
+                <span>Vende con nosotros</span>
+              </a>
+              <a href="mailto:vende@puntorepair.cl" className="promo-email">vende@puntorepair.cl</a>
+            </div>
+            <div className="promo-card">
+              <a 
+                href="https://drive.google.com/drive/folders/1h12LQO2srPGy6DxIZJqEJ42sh4UibCPZ?usp=drive_link" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="promo-btn cotiza"
+              >
+                <ShoppingBag size={20} className="promo-icon" />
+                <span>Compra con nosotros</span>
+              </a>
+              <a href="mailto:cotiza@puntorepair.cl" className="promo-email">cotiza@puntorepair.cl</a>
+            </div>
+          </div>
+        </section>
+
         {/* Services Section */}
         <section id="servicios" className="plans-section">
           <h2 className="section-title">Nuestros Servicios</h2>
@@ -643,10 +674,16 @@ function App() {
         <h2 className="footer-title">Contáctanos</h2>
         <SocialIcons size={32} />
 
-        <div className="email-contact" style={{ marginTop: '10px' }}>
+        <a href="mailto:mcanales@puntorepair.cl" className="email-contact" style={{ marginTop: '10px', textDecoration: 'none' }}>
           <Mail size={20} />
           <span>mcanales@puntorepair.cl</span>
-        </div>
+        </a>
+        <a href="https://wa.me/56990872747" target="_blank" rel="noopener noreferrer" className="email-contact" style={{ marginTop: '5px', textDecoration: 'none' }}>
+          <Phone size={20} />
+          <span>+56 9 9087 2747</span>
+        </a>
+
+
         <div className="footer-other-services">
           <h3 className="footer-other-title">Otros servicios</h3>
           <div className="footer-page-links">
