@@ -11,93 +11,82 @@
     const styles = `
         #support-chat-bubble-container {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 100px;
-            height: 100px;
+            bottom: 20%;
+            right: -60px; /* Enterrado para eliminar bordes transparentes */
+            width: 180px;
+            height: 150px;
             z-index: 10000;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
             cursor: pointer;
         }
 
-        /* El Botón Circular Premium (Capa Superior) */
-        #support-chat-bubble {
-            width: 85px;
-            height: 85px;
-            background: radial-gradient(circle at 30% 30%, #4facfe 0%, #0070f3 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0, 112, 243, 0.5), 
-                        inset 0 4px 8px rgba(255, 255, 255, 0.3);
-            z-index: 5;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+        /* Tooltip / Speech Bubble */
+        #support-chat-tooltip {
+            position: absolute;
+            bottom: 120px;
+            right: 60px;
+            background: #1a1a1a;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+            z-index: 10001;
         }
 
-        #support-chat-bubble::after {
+        #support-chat-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #support-chat-tooltip::after {
             content: '';
             position: absolute;
-            top: 5%;
-            left: 15%;
-            width: 70%;
-            height: 30%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
-            border-radius: 50%;
-            pointer-events: none;
+            bottom: -8px;
+            right: 40px;
+            border-width: 8px 8px 0;
+            border-style: solid;
+            border-color: #1a1a1a transparent transparent;
         }
 
-        #support-chat-bubble svg {
-            width: 35px;
-            height: 35px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            z-index: 6;
+        #support-chat-bubble-container:hover #support-chat-tooltip {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* El Robot 3D (Capa Inferior - Escondido) */
+        /* El Robot Peeking desde el lateral */
         .bot-img-wrapper {
             position: absolute;
-            width: 85px; /* Mismo tamaño que el botón */
-            height: 85px;
+            width: 180px;
+            height: 180px;
+            right: 0;
             z-index: 1;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform: translateY(0) scale(0.9);
-            opacity: 0;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transform: translateX(5%); /* Casi fuera para ver bien el ojo */
         }
 
         .bot-img {
-            width: 140%; /* Un poco más grande para que se note al asomarse */
-            height: 140%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            mix-blend-mode: multiply;
         }
 
-        /* Hover: El robot se asoma desde atrás */
+        /* Hover: El robot se asoma un poco más sin mostrar el corte */
         #support-chat-bubble-container:hover .bot-img-wrapper {
-            transform: translateY(-55px) scale(1.1); /* Sube hacia arriba */
-            opacity: 1;
+            transform: translateX(-15px);
         }
 
-        #support-chat-bubble-container:hover #support-chat-bubble {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 112, 243, 0.6);
-        }
-
-        /* Animación Idle sutil */
-        @keyframes subtle-peek {
-            0%, 100% { transform: translateY(0) scale(0.9); opacity: 0; }
-            50% { transform: translateY(-5px) scale(0.92); opacity: 0.3; }
-        }
-        #support-chat-bubble-container:not(:hover) .bot-img-wrapper {
-            animation: subtle-peek 4s infinite ease-in-out;
+        /* Ocultar el botón circular viejo */
+        #support-chat-bubble {
+            display: none;
         }
 
         #support-chat-container {
@@ -291,15 +280,12 @@
     // Create Trigger Button Container
     const bubbleContainer = document.createElement('div');
     bubbleContainer.id = 'support-chat-bubble-container';
-    bubbleContainer.className = 'active-tooltip'; // Activar el mensaje periódico
     bubbleContainer.innerHTML = `
         <div id="support-chat-tooltip">Hola, soy Mr. Repair. ¡Haz clic para ayudarte!</div>
         <div class="bot-img-wrapper">
-            <img src="Images/premium_bot.png" class="bot-img" alt="Bot">
+            <img src="/Images/bot_peeking.png" class="bot-img" alt="Bot">
         </div>
-        <div id="support-chat-bubble">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        </div>
+        <div id="support-chat-bubble"></div>
     `;
     document.body.appendChild(bubbleContainer);
 
@@ -308,7 +294,7 @@
     container.id = 'support-chat-container';
     container.innerHTML = `
         <div id="support-chat-character-area">
-            <img src="Images/bot2.png" alt="Bot Character">
+            <img src="/Images/bot2.png" alt="Bot Character">
         </div>
         <div id="support-chat-window">
             <div id="support-chat-header">
@@ -399,5 +385,16 @@
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleSend();
     });
+
+    // Tooltip Timer: Aparece automáticamente cada 10 segundos
+    const tooltip = document.getElementById('support-chat-tooltip');
+    setInterval(() => {
+        if (!container.classList.contains('active')) {
+            tooltip.classList.add('show');
+            setTimeout(() => {
+                tooltip.classList.remove('show');
+            }, 5000); // Se oculta después de 5 segundos
+        }
+    }, 10000); // Se activa cada 10 segundos
 
 })();
