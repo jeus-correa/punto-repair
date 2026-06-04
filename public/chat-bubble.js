@@ -371,8 +371,19 @@
                 })
             });
             const data = await response.json();
-            const botMessage = data.choices[0].message.content;
+            
+            if (data.error) {
+                const errMsg = data.error.message || (data.error.metadata && data.error.metadata.raw) || 'Error desconocido';
+                addMessage('bot', `Lo siento, hubo un error con el proveedor de IA: ${errMsg}`);
+                return;
+            }
 
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                addMessage('bot', 'Lo siento, el servidor no devolvió una respuesta válida.');
+                return;
+            }
+
+            const botMessage = data.choices[0].message.content;
             addMessage('bot', botMessage);
             chatHistory.push({ role: 'assistant', content: botMessage });
         } catch (error) {
