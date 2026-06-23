@@ -221,6 +221,18 @@
             border-bottom-left-radius: 4px;
             font-weight: 500;
         }
+        .msg h1, .msg h2, .msg h3 {
+            margin: 8px 0 4px 0;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .msg ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .msg li {
+            margin-bottom: 4px;
+        }
         #support-chat-input-container {
             padding: 20px 25px;
             display: flex;
@@ -343,11 +355,78 @@
         }, 400);
     });
 
+    // Helper to format basic markdown to HTML
+    function formatMarkdown(text) {
+        if (!text) return '';
+        
+        // Escape HTML to prevent XSS
+        let html = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+            
+        // Convert headers (###, ##, #)
+        html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+        
+        // Convert bold (**text**)
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Convert italic (*text*)
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Convert lists
+        const lines = html.split('\n');
+        let inList = false;
+        const processedLines = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            
+            // Match "* item" or "- item"
+            const listMatch = line.match(/^[\*\-\+]\s+(.*)$/);
+            if (listMatch) {
+                if (!inList) {
+                    processedLines.push('<ul>');
+                    inList = true;
+                }
+                processedLines.push(`<li>${listMatch[1]}</li>`);
+            } else {
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                processedLines.push(line);
+            }
+        }
+        if (inList) {
+            processedLines.push('</ul>');
+        }
+        
+        html = processedLines.join('\n');
+        
+        // Convert newlines to <br>
+        html = html.replace(/\n/g, '<br>');
+        
+        // Clean up margins/spacing for blocks
+        html = html.replace(/<\/h[1-3]><br>/g, '</h3>')
+                   .replace(/<\/ul><br>/g, '</ul>')
+                   .replace(/<\/li><br>/g, '</li>')
+                   .replace(/<ul><br>/g, '<ul>');
+                   
+        return html;
+    }
+
     // Add Message to UI
     function addMessage(role, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `msg msg-${role}`;
-        msgDiv.innerText = text;
+        if (role === 'bot') {
+            msgDiv.innerHTML = formatMarkdown(text);
+        } else {
+            msgDiv.innerText = text;
+        }
         messagesContainer.appendChild(msgDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
